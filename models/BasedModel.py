@@ -88,9 +88,9 @@ class BasedModel:
         output['train'] = self.trainer.train()
         output['Train_size'] = len(self.train_ds)
         output['Test_size'] = len(self.test_ds)
+        preds,labels = self.test(self.max_seq_length)
         output['preds'] = preds
         output['labels'] = labels
-        preds,labels = self.test(self.max_seq_length)
         output['Tuner_arg'] = self.extract_fields(self.essential_keys)
         output['adaptation'] = self.adaptation
         self.output = output
