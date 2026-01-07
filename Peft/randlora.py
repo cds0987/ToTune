@@ -11,5 +11,5 @@ def load_randlora_model(model, **kwargs):
     if is_4bit(model):
         model = model.half()
     model.print_trainable_parameters()
-
-    return model
+    kwargs['adaptation'] = 'randlora'
+    return model,kwargs

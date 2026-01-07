@@ -2,11 +2,46 @@ import time
 import torch
 import pandas as pd
 import gc
-class Model:
-    def __init__(self, model_name, max_seq_length,model = None,tokenizer = None):
+class BasedModel:
+    def __init__(self, model_name, max_seq_length,model = None,tokenizer = None,adaptation = {}):
         self.model_name = model_name
         self.max_seq_length = max_seq_length
+        self.adaptation = adaptation
         self.load_model(model,tokenizer)
+        self.essential_keys = [
+
+    # --- Data / Batching ---
+    "per_device_train_batch_size",
+    "per_device_eval_batch_size",
+    "gradient_accumulation_steps",
+
+    # --- Optimization ---
+    "learning_rate",
+    "weight_decay",
+    "adam_beta1",
+    "adam_beta2",
+    "adam_epsilon",
+    "max_grad_norm",
+    "optim",
+    "optim_args",
+    "adafactor",
+
+    # --- Training schedule ---
+    "num_train_epochs",
+    "max_steps",
+    "lr_scheduler_type",
+    "warmup_steps",
+    "warmup_ratio",
+
+    # --- Precision ---
+    "fp16",
+    "bf16",
+    "fp16_opt_level",
+    "half_precision_backend",
+
+    # --- Misc ---
+    "label_smoothing_factor",
+]
     def load_model(self,Model = None,tokenizer = None):
       if Model  is  None:
         raise ValueError("You must provide model and tokenizer explicitly")
@@ -48,7 +83,17 @@ class Model:
      result['n_gpu'] = self.trainer.args.n_gpu
      return result
     def train_test(self, *args, **kwargs):
-        pass
+        output = self.trainer.train()
+        output['Model_name'] = self.model_name
+        output['Train_size'] = len(self.train_ds)
+        output['Test_size'] = len(self.test_ds)
+        output['preds'] = preds
+        output['labels'] = labels
+        preds,labels = self.test(self.max_seq_length)
+        output['Tuner_arg'] = self.extract_fields(self.essential_keys)
+        output['adaptation'] = self.adaptation
+        self.output = output
+
 
 
 
