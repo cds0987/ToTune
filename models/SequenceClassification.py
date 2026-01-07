@@ -2,8 +2,8 @@ from transformers import TrainingArguments,Trainer
 from tqdm import tqdm
 from ToTune.models.BasedModel import BasedModel
 class SequenceClassification(BasedModel):
-  def __init__(self,model_name,max_seq_length,Model = None,tokenizer = None,target_modules = ['Not used'],r  = -1):
-    super().__init__(model_name,max_seq_length,Model,tokenizer,target_modules,r)
+  def __init__(self,model_name,max_seq_length,Model = None,tokenizer = None,adaptation = {}):
+    super().__init__(model_name,max_seq_length,Model,tokenizer,adaptation)
 
   def preprocess(self,train_ds,test_ds,text_col,label_col):
      self.text_col = text_col
