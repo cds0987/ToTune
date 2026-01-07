@@ -98,7 +98,7 @@ class UnifiedClassificationLoss(nn.Module):
 
 
 def _build_li_trainer(*args, loss_fn=None, **kwargs):
-    return LItrainer(
+    return LIWtrainer(
         *args,
         class_balanced_loss=loss_fn,
         **kwargs
