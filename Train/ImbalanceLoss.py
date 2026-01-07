@@ -22,7 +22,40 @@ class LIWtrainer(CustomTrainer):
 
         return (loss, outputs) if return_outputs else loss
 
+from types import MethodType
+from torch.utils.data import DataLoader, WeightedRandomSampler
+import numpy as np
+def enable_resample_for_trainer(trainer: "LIWtrainer"):
+    """
+    Locally override get_train_dataloader for ONE trainer instance only.
+    """
 
+    def get_train_dataloader_override(self):
+        train_dataset = self.train_dataset
+        labels = np.array(train_dataset["labels"])
+
+        class_counts = np.bincount(labels)
+        class_weights = 1.0 / class_counts
+        sample_weights = class_weights[labels]
+
+        sampler = WeightedRandomSampler(
+            sample_weights,
+            num_samples=len(sample_weights),
+            replacement=True,
+        )
+
+        return DataLoader(
+            train_dataset,
+            batch_size=self.args.train_batch_size,
+            sampler=sampler,
+            collate_fn=self.data_collator,
+            drop_last=self.args.dataloader_drop_last,
+            num_workers=self.args.dataloader_num_workers,
+        )
+
+    trainer.get_train_dataloader = MethodType(
+        get_train_dataloader_override, trainer
+    )
 
 import torch
 import torch.nn as nn
@@ -98,11 +131,19 @@ class UnifiedClassificationLoss(nn.Module):
 
 
 def _build_li_trainer(*args, loss_fn=None, **kwargs):
-    return LIWtrainer(
+    resample = kwargs.pop("resample", False)  # default = False
+
+    trainer = LIWtrainer(
         *args,
         class_balanced_loss=loss_fn,
         **kwargs
     )
+
+    if resample:
+        enable_resample_for_trainer(trainer)
+
+    return trainer
+
 
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
