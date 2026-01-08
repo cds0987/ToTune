@@ -91,9 +91,16 @@ class BasedModel:
     def train_test(self, *args, **kwargs):
         warn()
         output = {}
-
+        from ToTune.Tools.memory import total_current_mem,total_peak_mem
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+        mem_before = total_current_mem()
         output['Model_name'] = self.model_name
-        output['train'] = self.trainer.train()
+        output['trainoutput'] = self.trainer.train()
+        mem_peak = total_peak_mem()
+        output['trainer'] = self.trainer
+        output['FinetuneMemory'] = mem_peak - mem_before
+        torch.cuda.empty_cache()
         output['Train_size'] = len(self.train_ds)
         output['Test_size'] = len(self.test_ds)
         preds,labels = self.test(self.max_seq_length)
