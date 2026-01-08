@@ -1,5 +1,7 @@
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
 import torch
+from peft import prepare_model_for_kbit_training
+
 def load_sequence_classification_model(
     model_name: str,
     num_labels: int,
@@ -43,6 +45,9 @@ def load_sequence_classification_model(
         model_name,
         **model_kwargs,
     )
+
+    if load_in_4bit:
+        model = prepare_model_for_kbit_training(model)
 
     # Resize after adding pad token
     model.resize_token_embeddings(len(tokenizer))
