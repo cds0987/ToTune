@@ -2,6 +2,12 @@ import time
 import torch
 import pandas as pd
 import gc
+import warnings
+def warn():
+    warnings.filterwarnings(
+    "ignore",
+    message="torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly"
+)
 class BasedModel:
     def __init__(self, model_name,model = None,tokenizer = None,adaptation = {}, max_seq_length = 128):
         self.model_name = model_name
@@ -83,7 +89,9 @@ class BasedModel:
      result['n_gpu'] = self.trainer.args.n_gpu
      return result
     def train_test(self, *args, **kwargs):
+        warn()
         output = {}
+
         output['Model_name'] = self.model_name
         output['train'] = self.trainer.train()
         output['Train_size'] = len(self.train_ds)
