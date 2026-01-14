@@ -1,0 +1,26 @@
+[
+    {
+        "Mode": "Full Finetuning",
+        "Support models": "Full"
+    },
+    {
+        "Mode": "Lora Finetuning",
+        "Support models": "Full",
+        "Support adaptation": [
+            "Lora",
+            "RandLora",
+            "IA3",
+            "Prefix Tuning"
+        ]
+    },
+    {
+        "Mode": "QLora Finetuning",
+        "Support models": "Full",
+        "Support adaptation": [
+            "Lora",
+            "RandLora",
+            "IA3",
+            "Prefix Tuning"
+        ]
+    }
+]

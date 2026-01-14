@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title> Dataset Setup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dataset.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='Images/Logo2.png') }}">
+            <strong>ToTune</strong>
+        </div>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/tune">Tune</a>
+            <a href="/work">Workspace</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <!-- LEFT PANEL (CONTROL ONLY) -->
+        <section class="left-panel">
+            <h2>Select Target Columns</h2>
+
+            <div class="info-box">
+                Select columns directly from the sample table.
+            </div>
+
+            <form id="columnForm">
+                <div class="actions">
+                    <button type="button" class="btn-back" id="shuffleBtn">
+                        Shuffle Sample
+                    </button>
+                    <button type="submit" class="btn-submit">
+                        Confirm Selection
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="dataset-results">
+            <h3>Dataset Preview</h3>
+
+            <div class="sample-box">
+                <table class="sample-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Column</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function loadSamples(shuffle = false) {
+            fetch(`/showsamples?shuffle=${shuffle}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    const tbody = document.getElementById("sampleTableBody");
+                    tbody.innerHTML = "";
+
+                    const sample = data.sample; // {column: value}
+
+                    Object.entries(sample).forEach(([col, value]) => {
+                        const tr = document.createElement("tr");
+
+                        // Select checkbox
+                        const tdCheck = document.createElement("td");
+                        const checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.name = "columns";
+                        checkbox.value = col;
+                        tdCheck.appendChild(checkbox);
+
+                        // Column name
+                        const tdCol = document.createElement("td");
+                        tdCol.textContent = col;
+
+                        // Column value
+                        const tdVal = document.createElement("td");
+                        tdVal.textContent = value ?? "";
+
+                        tr.appendChild(tdCheck);
+                        tr.appendChild(tdCol);
+                        tr.appendChild(tdVal);
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        /* Initial load */
+        loadSamples();
+
+        /* Shuffle */
+        document.getElementById("shuffleBtn").addEventListener("click", () => {
+            loadSamples(true);
+        });
+
+        /* Submit selected columns */
+        /* Submit selected columns */
+        document.getElementById("columnForm").addEventListener("submit", e => {
+            e.preventDefault();
+
+            const selected = [...document.querySelectorAll(
+                "#sampleTableBody input[name='columns']:checked"
+            )].map(c => c.value);
+
+            if (selected.length === 0) {
+                alert("Please select at least one column.");
+                return;
+            }
+
+            fetch("/savedata", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    columns_data: selected
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "{{ url_for('mainpage.tunning') }}";
+                    }
+                });
+        });
+    </script>
+
+</body>
+
+</html>

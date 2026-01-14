@@ -1,0 +1,34 @@
+[
+    {
+        "Mode": "Lora",
+        "Support Modules": [
+            "Full",
+            "Attention",
+            "Mlp"
+        ]
+    },
+    {
+        "Mode": "RandLora",
+        "Support Modules": [
+            "Full",
+            "Attention",
+            "Mlp"
+        ]
+    },
+    {
+        "Mode": "IA3",
+        "Support Modules": [
+            "Full",
+            "Attention",
+            "Mlp"
+        ]
+    },
+    {
+        "Mode": "Prefix Tuning",
+        "Support Modules": [
+            "Full",
+            "Attention",
+            "Mlp"
+        ]
+    }
+]

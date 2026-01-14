@@ -1,0 +1,201 @@
+/* ===== BASE ===== */
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background-image: url("/static/Images/Background.png");
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    color: #222;
+}
+
+/* Dark overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+}
+
+/* ===== HEADER ===== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(240, 244, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(180, 190, 255, 0.4);
+}
+
+nav a {
+    margin-left: 30px;
+    color: #2f2f4f;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: #4b4bff;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo img {
+    height: 36px;
+}
+
+.logo strong {
+    color: #2b2b5f;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+    max-width: 1100px;
+    margin: 80px auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+/* LEFT PANEL */
+.container>div:first-child {
+    padding-right: 24px;
+    border-right: 1px solid #e6e6ff;
+}
+
+/* ===== TEXT ===== */
+h2 {
+    margin-top: 0;
+    color: #4b4bff;
+}
+
+.dataset-results h3 {
+    margin-top: 0;
+    color: #2b2b5f;
+}
+
+/* ===== INFO BOX ===== */
+.info-box {
+    background: #f2f3ff;
+    border: 1px solid #dadaff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #2b2b5f;
+}
+
+/* ===== FORM ===== */
+label {
+    display: block;
+    margin-top: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+}
+
+.actions button {
+    padding: 10px 26px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-back {
+    background: #ddd;
+}
+
+.btn-submit {
+    background: #4b4bff;
+    color: white;
+}
+
+/* ===== SAMPLE PREVIEW ===== */
+.sample-box {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.sample-item {
+    background: #f8f9ff;
+    border: 1px solid #e1e3ff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #2b2b5f;
+    white-space: pre-wrap;
+}
+
+/* Hover effect */
+.sample-item:hover {
+    background: #eef0ff;
+}
+
+/* Scrollbar */
+.sample-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sample-box::-webkit-scrollbar-thumb {
+    background: #c7c9ff;
+    border-radius: 6px;
+}
+
+/* ===== SAMPLE TABLE ===== */
+.sample-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.sample-table th,
+.sample-table td {
+    border: 1px solid #e1e3ff;
+    padding: 10px 12px;
+    vertical-align: top;
+}
+
+.sample-table th {
+    background: #f2f3ff;
+    color: #2b2b5f;
+    font-weight: 700;
+    text-align: left;
+}
+
+.sample-table tr:hover {
+    background: #eef0ff;
+}
+
+.sample-table td:nth-child(3) {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-width: 520px;
+}

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Finetune Setup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='vram.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='Images/Logo2.png') }}">
+            <strong>ToTune</strong>
+        </div>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/tune">Tune</a>
+            <a href="/work">Workspace</a>
+        </nav>
+    </header>
+
+    <div class="vram-container">
+
+        <div class="header-row">
+            <h1>Finetune Setup</h1>
+        </div>
+
+        <div class="main">
+
+            <!-- LEFT PANEL -->
+            <div>
+
+                <div class="card">
+                    <h3>Current Setup</h3>
+                    <div class="meta">
+                        Model: <strong id="model">—</strong><br>
+                        Task: <strong id="task">—</strong><br>
+                        Mode: <strong id="mode">—</strong>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Batch Size</h3>
+                    <div class="slider-row">
+                        <input type="range" min="1" max="256" value="8" id="batch">
+                        <span id="batch-val">8</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Sequence Length</h3>
+                    <div class="slider-row">
+                        <input type="range" min="64" max="32768" step="64" value="1024" id="seq">
+                        <span id="seq-val">1024</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Gradient Accumulation</h3>
+                    <div class="slider-row">
+                        <input type="range" min="1" max="64" value="1" id="grad">
+                        <span id="grad-val">1</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Advanced Configuration</h3>
+                    <div class="toggle"><span>Flash Attention</span><input type="checkbox" id="flash"></div>
+                    <div class="toggle"><span>Gradient Checkpointing</span><input type="checkbox" id="checkpoint"></div>
+                    <div class="toggle"><span>8-bit Optimizer</span><input type="checkbox" id="opt8"></div>
+                    <div class="toggle"><span>Paged Optimizer</span><input type="checkbox" id="paged"></div>
+                    <div class="toggle"><span>Fused Kernels</span><input type="checkbox" id="fused"></div>
+                    <div class="toggle"><span>Sequence Packing</span><input type="checkbox" id="pack"></div>
+                    <div class="toggle"><span>Dynamic Padding</span><input type="checkbox" id="pad"></div>
+                    <div class="toggle"><span>Activation Offloading</span><input type="checkbox" id="offload"></div>
+                </div>
+
+                <!-- ADAPTATION -->
+                <div class="card" id="adaptation-card" style="display:none;">
+                    <h3>Adaptation Method</h3>
+
+                    <div class="field">
+                        <label>Method</label>
+                        <select id="adapt-method">
+                            <option value="lora">LoRA</option>
+                            <option value="ia3">IA³</option>
+                            <option value="randlora">RandLoRA</option>
+                            <option value="adalora">AdaLoRA</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Target Modules</label>
+                        <select id="adapt-module">
+                            <option value="full">Full</option>
+                            <option value="attention">Attention</option>
+                            <option value="mlp">MLP</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Rank</label>
+                        <input type="number" id="adapt-rank" value="8" min="1" max="256">
+                    </div>
+
+                    <div class="field">
+                        <label>Alpha</label>
+                        <input type="number" id="adapt-alpha" value="16" min="1" max="512">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="results">
+                <h2>VRAM Calculator</h2>
+
+                <div class="circle">
+                    <span id="percent">0%</span>
+                </div>
+                <div class="vram-text" id="vram">
+                    <strong>0 GB</strong> of 12 GB VRAM
+                </div>
+                <div class="trainspeed" id="trainspeed">
+                    <strong>0</strong> tokens per second
+                </div>
+                <div class="samplesec" id="samplesec">
+                    <strong>0</strong> samples per second
+                </div>
+                <div class="stepsec" id="stepsec">
+                    <strong>0</strong> steps per second
+                </div>
+                <div class="start-btn-wrapper">
+                    <button id="start-finetune" class="start-btn">
+                        Done
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* ---------- SLIDERS ---------- */
+        function bindSlider(id) {
+            const el = document.getElementById(id);
+            const val = document.getElementById(id + "-val");
+            val.textContent = el.value;
+            el.oninput = () => {
+                val.textContent = el.value;
+                updateVRAM();
+            };
+        }
+
+        bindSlider("batch");
+        bindSlider("seq");
+        bindSlider("grad");
+
+        /* ---------- ADAPTATION ELEMENTS ---------- */
+        const adaptMethod = document.getElementById("adapt-method");
+        const adaptModule = document.getElementById("adapt-module");
+        const adaptRank = document.getElementById("adapt-rank");
+        const adaptAlpha = document.getElementById("adapt-alpha");
+
+        /* ---------- MODE UI ---------- */
+        function updateModeUI(mode) {
+            const card = document.getElementById("adaptation-card");
+            card.style.display =
+                mode && mode.toLowerCase() !== "full finetuning" ? "block" : "none";
+        }
+
+        /* ---------- STATE ---------- */
+        function getState() {
+            return {
+                batch: +batch.value,
+                seq: +seq.value,
+                grad: +grad.value,
+
+                model: model.textContent,
+                task: task.textContent,
+                mode: mode.textContent,
+
+                adaptation:
+                    mode.textContent &&
+                        mode.textContent.toLowerCase() !== "full finetuning"
+                        ? {
+                            method: adaptMethod.value,
+                            module: adaptModule.value,
+                            rank: +adaptRank.value,
+                            alpha: +adaptAlpha.value
+                        }
+                        : null,
+
+                options: {
+                    flash: flash.checked,
+                    checkpoint: checkpoint.checked,
+                    opt8: opt8.checked,
+                    paged: paged.checked,
+                    fused: fused.checked,
+                    pack: pack.checked,
+                    pad: pad.checked,
+                    offload: offload.checked
+                }
+            };
+        }
+
+        /* ---------- API ---------- */
+        async function updateVRAM() {
+            const payload = getState();
+            console.log("VRAM payload:", payload);
+
+            const res = await fetch("/api/vram-calc", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const d = await res.json();
+
+            percent.textContent = d.percent + "%";
+            vram.innerHTML = `<strong>${d.vram_used} GB</strong> of ${d.vram_total} GB VRAM`;
+            trainspeed.innerHTML = `<strong>${d.trainspeed}</strong> tokens per second`;
+            samplesec.innerHTML = `<strong>${d.sample_sec}</strong> samples per second`;
+            stepsec.innerHTML = `<strong>${d.step_sec}</strong> steps per second`;
+            status.textContent = d.status;
+            status.className = "badge " + (d.status === "OK" ? "success" : "danger");
+        }
+
+        /* ---------- EVENTS ---------- */
+        document.querySelectorAll("input, select")
+            .forEach(el => el.addEventListener("change", updateVRAM));
+
+        /* ---------- LOAD USER CONFIG ---------- */
+        fetch("{{ url_for('static', filename='data/user.json') }}")
+            .then(r => r.json())
+            .then(d => {
+                model.textContent = d.workmodel || "—";
+                task.textContent = d.Task || "—";
+                mode.textContent = d.TuneModes || "—";
+
+                updateModeUI(d.TuneModes);
+                updateVRAM();
+            });
+        document.getElementById("start-finetune").addEventListener("click", async () => {
+            const payload = getState();
+
+            try {
+                const res = await fetch("/saveconfig", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    window.location.href = "/dataset";
+                } else {
+                    alert("Failed to save configuration");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error saving configuration");
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

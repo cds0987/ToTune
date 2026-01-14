@@ -1,0 +1,18 @@
+[
+    {
+        "Mode": "Sentence Classification",
+        "Support models": "Full"
+    },
+    {
+        "Mode": "Token Classification",
+        "Support models": "Full"
+    },
+    {
+        "Mode": "Next Sentence Prediction",
+        "Support models": "Full"
+    },
+    {
+        "Mode": "Text Generation",
+        "Support models": "Full"
+    }
+]

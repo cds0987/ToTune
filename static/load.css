@@ -1,0 +1,29 @@
+body {
+    font-family: Inter, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #0f1220;
+    color: white;
+}
+
+.box {
+    text-align: center;
+}
+
+.spinner {
+    margin: 30px auto;
+    width: 60px;
+    height: 60px;
+    border: 6px solid #444;
+    border-top: 6px solid #4b4bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

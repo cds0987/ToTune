@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support Models</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='SupportModel.css') }}" />
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='Images/Logo2.png') }}" />
+            <strong>ToTune</strong>
+        </div>
+
+        <nav>
+            <a href="#">Models</a>
+            <a href="#">Dataset</a>
+            <a href="#">Docs</a>
+        </nav>
+    </header>
+
+    <div class="Center">
+        <div class="section-title">Models</div>
+        <div id="cards-container"></div>
+    </div>
+
+    <script>
+        fetch("{{ url_for('static', filename='data/models.json') }}")
+            .then(res => res.json())
+            .then(models => {
+                const container = document.getElementById("cards-container");
+
+                models.forEach(model => {
+                    const card = document.createElement("div"); // 👈 DIV, NOT BUTTON
+                    card.className = "card";
+
+                    card.innerHTML = `
+                <div class="card-title">${model.title}</div>
+                <div class="actions">
+                    <button class="btn-infer" type="button">Inference</button>
+                    <button class="btn-finetune" type="button">Finetuning</button>
+                </div>
+            `;
+
+                    // Card selection UI
+                    card.addEventListener("click", () => {
+                        document.querySelectorAll(".card").forEach(c => {
+                            if (c !== card) c.classList.remove("active");
+                        });
+                        card.classList.toggle("active");
+                    });
+
+                    // Inference
+                    card.querySelector(".btn-infer").addEventListener("click", e => {
+                        e.stopPropagation();
+
+                        fetch("/select-model", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                workmodel: model.title,
+                                mode: "inference"
+                            })
+                        });
+                    });
+
+                    // ✅ Finetune + redirect
+                    card.querySelector(".btn-finetune").addEventListener("click", e => {
+                        e.stopPropagation();
+
+                        fetch("/select-model", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                workmodel: model.title,
+                                mode: "finetuning"
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(data => {
+                                console.log("Server response:", data); // 👈 debug
+                                if (data.redirect) {
+                                    window.location.href = data.redirect;
+                                }
+                            });
+                    });
+
+                    container.appendChild(card);
+                });
+            });
+    </script>
+
+
+
+</body>
+
+</html>

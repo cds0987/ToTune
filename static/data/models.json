@@ -1,0 +1,74 @@
+[
+    {
+        "title": "BERT",
+        "description": "BERT is a bidirectional transformer pretrained on unlabeled text to predict masked tokens in a sentence and to predict whether one sentence follows another. The main idea is that by randomly masking some tokens, the model can train on text to the left and right, giving it a more thorough understanding. BERT is also very versatile because its learned language representations can be adapted for other NLP tasks by fine-tuning an additional layer or head.\nYou can find all the original BERT checkpoints under the BERT collection.",
+        "parameters": 330
+    },
+    {
+        "title": "ALBERT",
+        "description": "ALBERT is designed to address memory limitations of scaling and training of BERT. It adds two parameter reduction techniques. The first, factorized embedding parametrization, splits the larger vocabulary embedding matrix into two smaller matrices so you can grow the hidden size without adding a lot more parameters. The second, cross-layer parameter sharing, allows layer to share parameters which keeps the number of learnable parameters lower.\nALBERT was created to address problems like — GPU/TPU memory limitations, longer training times, and unexpected model degradation in BERT. ALBERT uses two parameter-reduction techniques to lower memory consumption and increase the training speed of BERT:\n\n* Factorized embedding parameterization: The large vocabulary embedding matrix is decomposed into two smaller matrices, reducing memory consumption.\n\n* Cross-layer parameter sharing: Instead of learning separate parameters for each transformer layer, ALBERT shares parameters across layers, further reducing the number of learnable weights.\n\nALBERT uses absolute position embeddings (like BERT) so padding is applied at right. Size of embeddings is 128 While BERT uses 768. ALBERT can processes maximum 512 token at a time.",
+        "parameters": 330
+    },
+    {
+        "title": "BART",
+        "description": "BART is a sequence-to-sequence model that combines the pretraining objectives from BERT and GPT. It’s pretrained by corrupting text in different ways like deleting words, shuffling sentences, or masking tokens and learning how to fix it. The encoder encodes the corrupted document and the corrupted text is fixed by the decoder. As it learns to recover the original text, BART gets really good at both understanding and generating language.",
+        "parameters": 330
+    },
+    {
+        "title": "DeBERTa",
+        "description": "DeBERTa improves the pretraining efficiency of BERT and RoBERTa with two key ideas, disentangled attention and an enhanced mask decoder. Instead of mixing everything together like BERT, DeBERTa separates a word’s content from its position and processes them independently. This gives it a clearer sense of what’s being said and where in the sentence it’s happening.\nThe enhanced mask decoder replaces the traditional softmax decoder to make better predictions.\nEven with less training data than RoBERTa, DeBERTa manages to outperform it on several benchmarks.\nYou can find all the original DeBERTa checkpoints under the Microsoft organization.",
+        "parameters": 330
+    },
+    {
+        "title": "DeBERTa-v2",
+        "description": "DeBERTa-v2 improves on the original DeBERTa architecture by using a SentencePiece-based tokenizer and a new vocabulary size of 128K. It also adds an additional convolutional layer within the first transformer layer to better learn local dependencies of input tokens. Finally, the position projection and content projection matrices are shared in the attention layer to reduce the number of parameters."
+    },
+    {
+        "title": "DistilBERT",
+        "description": "DistilBERT is pretrained by knowledge distillation to create a smaller model with faster inference and requires less compute to train. Through a triple loss objective during pretraining, language modeling loss, distillation loss, cosine-distance loss, DistilBERT demonstrates similar performance to a larger transformer language model."
+    },
+    {
+        "title": "ELECTRA",
+        "description": "ELECTRA modifies the pretraining objective of traditional masked language models like BERT. Instead of just masking tokens and asking the model to predict them, ELECTRA trains two models, a generator and a discriminator. The generator replaces some tokens with plausible alternatives and the discriminator (the model you’ll actually use) learns to detect which tokens are original and which were replaced. This training approach is very efficient and scales to larger models while using considerably less compute."
+    },
+    {
+        "title": "Falcon3",
+        "description": "Falcon3 represents a natural evolution from previous releases, emphasizing expanding the models’ science, math, and code capabilities. This iteration includes five base models: Falcon3-1B-Base, Falcon3-3B-Base, Falcon3-Mamba-7B-Base, Falcon3-7B-Base, and Falcon3-10B-Base. In developing these models, we incorporated several key innovations aimed at improving the models’ performances while reducing training costs:\nOne pre-training: We conducted a single large-scale pretraining run on the 7B model, using 2048 H100 GPU chips, leveraging 14 trillion tokens featuring web, code, STEM, and curated high-quality and multilingual data. Depth up-scaling for improved reasoning: Building on recent studies on the effects of model depth, we upscaled the 7B model to a 10B parameters model by duplicating the redundant layers and continuing pre-training with 2TT of high-quality data. This yielded Falcon3-10B-Base which achieves state-of-the-art zero-shot and few-shot performance for models under 13B parameters. Knowledge distillation for better tiny models: To provide compact and efficient alternatives, we developed Falcon3-1B-Base and Falcon3-3B-Base by leveraging pruning and knowledge distillation techniques, using less than 100GT of curated high-quality data, thereby redefining pre-training efficiency."
+    },
+    {
+        "title": "Gemma",
+        "description": "Gemma is a family of lightweight language models with pretrained and instruction-tuned variants, available in 2B and 7B parameters. The architecture is based on a transformer decoder-only design. It features Multi-Query Attention, rotary positional embeddings (RoPE), GeGLU activation functions, and RMSNorm layer normalization.\nThe instruction-tuned variant was fine-tuned with supervised learning on instruction-following data, followed by reinforcement learning from human feedback (RLHF) to align the model outputs with human preferences."
+    },
+    {
+        "title": "Gemma2",
+        "description": "Gemma 2 is a family of language models with pretrained and instruction-tuned variants, available in 2B, 9B, 27B parameters. The architecture is similar to the previous Gemma, except it features interleaved local attention (4096 tokens) and global attention (8192 tokens) and grouped-query attention (GQA) to increase inference performance.\nThe 2B and 9B models are trained with knowledge distillation, and the instruction-tuned variant was post-trained with supervised fine-tuning and reinforcement learning."
+    },
+    {
+        "title": "GLM",
+        "description": "The GLM Model was proposed in ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools by GLM Team, THUDM & ZhipuAI.\nThe abstract from the paper is the following:\nWe introduce ChatGLM, an evolving family of large language models that we have been developing over time. This report primarily focuses on the GLM-4 language series, which includes GLM-4, GLM-4-Air, and GLM-4-9B. They represent our most capable models that are trained with all the insights and lessons gained from the preceding three generations of ChatGLM. To date, the GLM-4 models are pre-trained on ten trillions of tokens mostly in Chinese and English, along with a small set of corpus from 24 languages, and aligned primarily for Chinese and English usage. The high-quality alignment is achieved via a multi-stage post-training process, which involves supervised fine-tuning and learning from human feedback. Evaluations show that GLM-4 1) closely rivals or outperforms GPT-4 in terms of general metrics such as MMLU, GSM8K, MATH, BBH, GPQA, and HumanEval, 2) gets close to GPT-4-Turbo in instruction following as measured by IFEval, 3) matches GPT-4 Turbo (128K) and Claude 3 for long context tasks, and 4) outperforms GPT-4 in Chinese alignments as measured by AlignBench. The GLM-4 All Tools model is further aligned to understand user intent and autonomously decide when and which tool(s) to use—including web browser, Python interpreter, text-to-image model, and user-defined functions—to effectively complete complex tasks. In practical applications, it matches and even surpasses GPT-4 All Tools in tasks like accessing online information via web browsing and solving math problems using Python interpreter. Over the course, we have open-sourced a series of models, including ChatGLM-6B (three generations), GLM-4-9B (128K, 1M), GLM-4V-9B, WebGLM, and CodeGeeX, attracting over 10 million downloads on Hugging face in the year 2023 alone."
+    },
+    {
+        "title": "MPT",
+        "description": "The MPT model was proposed by the MosaicML team and released with multiple sizes and finetuned variants. The MPT models are a series of open source and commercially usable LLMs pre-trained on 1T tokens.\nMPT models are GPT-style decoder-only transformers with several improvements: performance-optimized layer implementations, architecture changes that provide greater training stability, and the elimination of context length limits by replacing positional embeddings with ALiBi.\n\n* MPT base: MPT base pre-trained models on next token prediction\n\n* MPT instruct: MPT base models fine-tuned on instruction based tasks\n\n* MPT storywriter: MPT base models fine-tuned for 2500 steps on 65k-token excerpts of fiction books contained in the books3 corpus, this enables the model to handle very long sequences"
+    },
+    {
+        "title": "Qwen2",
+        "description": "Qwen2 is a family of large language models (pretrained, instruction-tuned and mixture-of-experts) available in sizes from 0.5B to 72B parameters. The models are built on the Transformer architecture featuring enhancements like group query attention (GQA), rotary positional embeddings (RoPE), a mix of sliding window and full attention, and dual chunk attention with YARN for training stability. Qwen2 models support multiple languages and context lengths up to 131,072 tokens."
+    },
+    {
+        "title": "Qwen2MoE",
+        "description": "Qwen2MoE is a Mixture-of-Experts (MoE) variant of Qwen2, available as a base model and an aligned chat model. It uses SwiGLU activation, group query attention and a mixture of sliding window attention and full attention. The tokenizer can also be adapted to multiple languages and codes.\nThe MoE architecture uses upcyled models from the dense language models. For example, Qwen1.5-MoE-A2.7B is upcycled from Qwen-1.8B. It has 14.3B parameters but only 2.7B parameters are activated during runtime."
+    },
+    {
+        "title": "Qwen3",
+        "description": "Overview\nQwen3 refers to the dense model architecture Qwen3-32B which was released with its mixture of experts variant Qwen3MoE"
+    },
+    {
+        "title": "T5",
+        "description": "T5 is a encoder-decoder transformer available in a range of sizes from 60M to 11B parameters. It is designed to handle a wide range of NLP tasks by treating them all as text-to-text problems. This eliminates the need for task-specific architectures because T5 converts every NLP task into a text generation task.\nTo formulate every task as text generation, each task is prepended with a task-specific prefix (e.g., translate English to German: …, summarize: …). This enables T5 to handle tasks like translation, summarization, question answering, and more."
+    },
+    {
+        "title": "T5Gemma",
+        "description": "T5Gemma (aka encoder-decoder Gemma) was proposed in a research paper by Google. It is a family of encoder-decoder large language models, developed by adapting pretrained decoder-only models into encoder-decoder. T5Gemma includes pretrained and instruction-tuned variants. The architecture is based on transformer encoder-decoder design following T5, with improvements from Gemma 2: GQA, RoPE, GeGLU activation, RMSNorm, and interleaved local/global attention.\nT5Gemma has two groups of model sizes: 1) Gemma 2 sizes (2B-2B, 9B-2B, and 9B-9B), which are based on the official Gemma 2 models (2B and 9B); and 2) T5 sizes (Small, Base, Large, and XL), where are pretrained under the Gemma 2 framework following T5 configuration. In addition, we also provide a model at ML size (medium large, ~2B in total), which is in-between T5 Large and T5 XL.\nThe pretrained variants are trained with two objectives: prefix language modeling with knowledge distillation (PrefixLM) and UL2, separately. We release both variants for each model size. The instruction-turned variants was post-trained with supervised fine-tuning and reinforcement learning."
+    }
+]

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finetuning & Dataset Setup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CoreTuneSetUp.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='Images/Logo2.png') }}">
+            <strong>ToTune</strong>
+        </div>
+        <nav>
+            <a href="#">Models</a>
+            <a href="#">Dataset</a>
+            <a href="#">Docs</a>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <h2>Finetuning & Dataset Setup</h2>
+
+        <!-- CONTEXT -->
+        <div class="info-box">Model: <span id="workmodel">Loading...</span></div>
+
+        <form id="setup-form">
+
+            <!-- FINETUNE -->
+            <label for="task">Task</label>
+            <select id="task" required>
+                <option value="">-- Select Task --</option>
+                <option>Sentence Classification</option>
+                <option>Token Classification</option>
+                <option>Next Sentence Prediction</option>
+                <option>Text Generation</option>
+            </select>
+
+            <label for="mode">Tuning Mode</label>
+            <select id="mode" required>
+                <option value="">-- Select Mode --</option>
+                <option>Full Finetuning</option>
+                <option>Lora Finetuning</option>
+            </select>
+
+            <!-- DATASET -->
+            <label for="platform">Dataset Platform</label>
+            <select id="platform" required>
+                <option value="">-- Select Platform --</option>
+                <option value="kaggle">Kaggle</option>
+                <option value="huggingface">Hugging Face</option>
+                <option value="custom">Custom Source</option>
+            </select>
+
+            <label for="access">Data Access</label>
+            <input id="access" type="text" required placeholder="Select a platform first" />
+            <div class="hint" id="access-hint"></div>
+
+            <div class="actions">
+                <button type="button" class="btn-back" onclick="history.back()">Back</button>
+                <button type="submit" class="btn-submit">Submit</button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script>
+        // Load model info
+        fetch("{{ url_for('static', filename='data/user.json') }}")
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("workmodel").textContent =
+                    data.workmodel || "—";
+            });
+
+        const platform = document.getElementById("platform");
+        const access = document.getElementById("access");
+        const hint = document.getElementById("access-hint");
+
+        platform.addEventListener("change", () => {
+            if (platform.value === "kaggle") {
+                access.placeholder = "https://www.kaggle.com/datasets/...";
+                hint.textContent = "Paste Kaggle dataset link";
+            } else if (platform.value === "huggingface") {
+                access.placeholder = "username/dataset-name";
+                hint.textContent = "Hugging Face dataset repo";
+            } else if (platform.value === "custom") {
+                access.placeholder = "Local path or URL";
+                hint.textContent = "Any custom data source";
+            } else {
+                access.placeholder = "Select a platform first";
+                hint.textContent = "";
+            }
+        });
+
+        document.getElementById("setup-form").addEventListener("submit", e => {
+            e.preventDefault();
+
+            fetch("/select-setup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Task: document.getElementById("task").value,
+                    TuneModes: document.getElementById("mode").value,
+                    platform: platform.value,
+                    access: access.value
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "ok") {
+                        window.location.href = "{{ url_for('mainpage.load') }}";
+                    } else {
+                        alert("Failed to save configuration");
+                    }
+                })
+                .catch(() => alert("Server error"));
+        });
+    </script>
+
+</body>
+
+</html>

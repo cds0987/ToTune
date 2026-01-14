@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Preparing Training</title>
+
+    <!-- Link external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='load.css') }}">
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>Preparing Model & Dataset</h2>
+        <p>Please wait while we load everything…</p>
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Trigger the server-side load function
+        fetch("/load", { method: "POST" })
+            .catch(err => console.error("Load request failed", err));
+
+        // Poll /status every 2 seconds
+        function checkStatus() {
+            fetch("/status")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.Waitting === false) {
+                        window.location.href = "/finetunesetup";
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        setInterval(checkStatus, 2000);
+    </script>
+
+</body>
+
+</html>

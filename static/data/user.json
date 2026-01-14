@@ -1,0 +1,58 @@
+{
+    "Task": "Token Classification",
+    "TuneModes": "Lora Finetuning",
+    "workmodel": "ALBERT",
+    "mode": "finetuning",
+    "Data Access": "gunnybd01/ModelAgg",
+    "Platform": "huggingface",
+    "Waitting": false,
+    "LoadModel": true,
+    "LoadData": true,
+    "adaptation": {
+        "method": "ia3",
+        "module": "attention",
+        "rank": 8,
+        "alpha": 16
+    },
+    "options": {
+        "flash": false,
+        "checkpoint": false,
+        "opt8": false,
+        "paged": true,
+        "fused": true,
+        "pack": false,
+        "pad": false,
+        "offload": false
+    },
+    "datasets": [
+        {
+            "id": "alpaca",
+            "name": "Alpaca Instruction",
+            "samples": 52000,
+            "features": [
+                "instruction",
+                "input",
+                "output"
+            ]
+        },
+        {
+            "id": "openorca",
+            "name": "OpenOrca",
+            "samples": 430000,
+            "features": [
+                "prompt",
+                "response"
+            ]
+        }
+    ],
+    "dataset_config": {},
+    "columns_data": [
+        "about",
+        "description"
+    ],
+    "vram_used": 3.76,
+    "trainspeed": 200,
+    "sample_sec": 0.06,
+    "step_sec": 2,
+    "Training": false
+}
