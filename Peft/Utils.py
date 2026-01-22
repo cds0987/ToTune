@@ -6,3 +6,5 @@ def load_peft_model(model,adaptation = 'lora', **kwargs):
         return load_lora_model(model, **kwargs)
     elif adaptation == 'randlora':
         return load_randlora_model(model, **kwargs)
+    else:
+        pass
