@@ -12,4 +12,4 @@ def load_randlora_model(model, **kwargs):
         model = model.half()
     model.print_trainable_parameters()
     kwargs['adaptation'] = 'randlora'
-    return model,kwargs
+    return model,config.to_dict()
