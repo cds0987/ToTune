@@ -10,6 +10,5 @@ def load_randlora_model(model, **kwargs):
     model = get_peft_model(model, config)
     if is_4bit(model):
         model = model.half()
-    model.print_trainable_parameters()
     kwargs['adaptation'] = 'randlora'
     return model,config.to_dict()

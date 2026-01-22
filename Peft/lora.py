@@ -11,6 +11,5 @@ def load_lora_model(model, **kwargs):
     kwargs['task_type'] = "SEQ_CLS" if 'task_type' not in kwargs else kwargs['task_type']
     config = LoraConfig(**kwargs)
     model = get_peft_model(model, config)
-    model.print_trainable_parameters()
     kwargs['adaptation'] = 'lora'
     return model,config.to_dict()
