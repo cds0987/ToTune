@@ -7,7 +7,7 @@ def load_sequence_classification_model(
     num_labels: int,
     token: None = None,
     load_in_4bit: bool = False,
-    compute_dtype: torch.dtype = torch.float16,
+    compute_dtype: torch.dtype = torch.float16,use_gradient_checkpointing = False
 ):
     # --- Tokenizer kwargs ---
     tok_kwargs = {}
@@ -47,7 +47,7 @@ def load_sequence_classification_model(
     )
 
     if load_in_4bit:
-        model = prepare_model_for_kbit_training(model)
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing = use_gradient_checkpointing)
 
     # Resize after adding pad token
     model.resize_token_embeddings(len(tokenizer))
