@@ -4,6 +4,40 @@ from ToTune.models.BasedModel import BasedModel
 class SequenceClassification(BasedModel):
   def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
     super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
+    self.essential_keys = [
+
+    # --- Data / Batching ---
+    "per_device_train_batch_size",
+    "per_device_eval_batch_size",
+    "gradient_accumulation_steps",
+
+    # --- Optimization ---
+    "learning_rate",
+    "weight_decay",
+    "adam_beta1",
+    "adam_beta2",
+    "adam_epsilon",
+    "max_grad_norm",
+    "optim",
+    "optim_args",
+    "adafactor",
+
+    # --- Training schedule ---
+    "num_train_epochs",
+    "max_steps",
+    "lr_scheduler_type",
+    "warmup_steps",
+    "warmup_ratio",
+
+    # --- Precision ---
+    "fp16",
+    "bf16",
+    "fp16_opt_level",
+    "half_precision_backend",
+
+    # --- Misc ---
+    "label_smoothing_factor",
+]
 
   def preprocess(self,train_ds,test_ds,text_col,label_col):
      self.text_col = text_col
@@ -83,3 +117,27 @@ class SequenceClassification(BasedModel):
         probs.extend(batch_probs.cpu().tolist())
         preds.extend(batch_preds.cpu().numpy().tolist())
     return preds,probs
+  def train_test(self, *args, **kwargs):
+        from ToTune.models.BasedModel import warn
+        import torch
+        warn()
+        output = {}
+        from ToTune.Tools.memory import total_current_mem,total_peak_mem
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+        mem_before = total_current_mem()
+        output['Model_name'] = self.model_name
+        output['trainoutput'] = self.trainer.train()
+        mem_peak = total_peak_mem()
+        output['trainer'] = self.trainer
+        output['FinetuneMemory'] = mem_peak - mem_before
+        torch.cuda.empty_cache()
+        output['Train_size'] = len(self.train_ds)
+        output['Test_size'] = len(self.test_ds)
+        preds,probs,labels = self.test(self.max_seq_length)
+        output['preds'] = preds
+        output['probs'] = probs
+        output['labels'] = labels
+        output['Tuner_arg'] = self.extract_fields(self.essential_keys)
+        output['adaptation'] = self.adaptation
+        self.output = output
