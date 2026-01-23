@@ -1,0 +1,50 @@
+from ToTune.Peft.Utils import load_peft_model
+from ToTune.models.Utils import load_sequence_classification_model
+from ToTune.models.SequenceClassification import SequenceClassification
+
+def print_point(point):
+    print("\n===== TRAINING CONFIG =====")
+    for k, v in point.items():
+        print(f"{k:<22}: {v}")
+    print("===========================\n")
+
+def sequence_classification_model(point):
+    load_in_4bit = point['load_in_4bit']
+    num_labels = point['num_labels']
+    use_gradient_checkpointing = point['use_gradient_checkpointing']
+    model_name = point['model_name']
+    max_seq = point['max_seq']
+    Used_model, tokenizer = load_sequence_classification_model(
+        model_name, num_labels, load_in_4bit=load_in_4bit,use_gradient_checkpointing = use_gradient_checkpointing
+    )
+    peft_config = point['peft_config'] if 'peft_config' in point else None
+    if peft_config is None:
+        peft_config = {}
+        peft_config['target_modules'] = ['Not used']
+        peft_config['r'] = -1
+    else:
+        adaptation = peft_config['adaptation']
+        peft_config.pop("adaptation", None)
+        Used_model,adaptation = load_peft_model(Used_model,adaptation = adaptation, **peft_config)
+        peft_config = adaptation
+    SeqCls = SequenceClassification(model_name,Used_model,tokenizer,peft_config,max_seq)
+    return SeqCls
+
+def prepare_data(SeqCls,point):
+  train_ds, test_ds, text_col, labels_col = point['train_ds'], point['test_ds'], point['text_col'], point['labels_col']
+  SeqCls.preprocess(train_ds,test_ds,text_col,labels_col)
+
+def trainersetting(SeqCls,point):
+  args = point['trainargs'] if 'trainargs' in point else None
+  SeqCls.prepare_trainer(args)
+
+def postproccess(SeqCls):
+  SeqCls.train_test()
+
+def train_SeqCls(point):
+  print_point(point)
+  SeqCls = sequence_classification_model(point)
+  prepare_data(SeqCls,point)
+  trainersetting(SeqCls,point)
+  postproccess(SeqCls)
+  return SeqCls
