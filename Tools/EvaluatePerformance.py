@@ -131,3 +131,81 @@ def plot_confusion_matrix(cm_df, title="Confusion Matrix",
 
     plt.tight_layout()
     plt.show()
+
+
+
+from sklearn.metrics import (
+    log_loss,
+    roc_auc_score,
+    average_precision_score,
+    brier_score_loss,
+    top_k_accuracy_score,
+)
+
+def evaluate_probabilities(labels, probs):
+    """
+    labels: array-like of shape (n_samples,)
+    probs : array-like of shape (n_samples, n_classes)
+    """
+
+    y_true = np.asarray(labels)
+    probs = np.asarray(probs)
+
+    n_classes = probs.shape[1]
+    is_binary = n_classes == 2
+
+    metrics = {}
+
+    # -----------------------------
+    # 1. Calibration / confidence
+    # -----------------------------
+    metrics["Log Loss"] = log_loss(y_true, probs)
+
+    if is_binary:
+        metrics["Brier Score"] = brier_score_loss(y_true, probs[:, 1])
+
+    # -----------------------------
+    # 2. Ranking quality
+    # -----------------------------
+    if is_binary:
+        metrics["ROC-AUC"] = roc_auc_score(y_true, probs[:, 1])
+        metrics["PR-AUC"] = average_precision_score(y_true, probs[:, 1])
+    else:
+        metrics["ROC-AUC (OvR Macro)"] = roc_auc_score(
+            y_true, probs, multi_class="ovr", average="macro"
+        )
+        metrics["PR-AUC (Macro)"] = average_precision_score(
+            y_true, probs, average="macro"
+        )
+
+    # -----------------------------
+    # 3. Top-k accuracy (prob-based)
+    # -----------------------------
+    for k in [1, 3, 5]:
+        if k <= n_classes:
+            metrics[f"Top-{k} Accuracy"] = top_k_accuracy_score(
+                y_true, probs, k=k
+            )
+
+    # -----------------------------
+    # 4. Confidence statistics
+    # -----------------------------
+    max_conf = probs.max(axis=1)
+
+    metrics["Mean Confidence"] = max_conf.mean()
+    metrics["Median Confidence"] = np.median(max_conf)
+    metrics["Confidence Std"] = max_conf.std()
+
+    # -----------------------------
+    # 5. Uncertainty (entropy)
+    # -----------------------------
+    entropy = -(probs * np.log(probs + 1e-12)).sum(axis=1)
+    metrics["Mean Entropy"] = entropy.mean()
+    metrics["Entropy Std"] = entropy.std()
+
+    return (
+        pd.DataFrame.from_dict(metrics, orient="index", columns=["Score"])
+        .reset_index()
+        .rename(columns={"index": "Metric"})
+        .round(4)
+    )
