@@ -78,7 +78,7 @@ def postprocess(SeqCls):
     results = evaluate_classification(labels=labels, predictions=preds)
     results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
 
-    SeqCls["evaluation"] = results
+    SeqCls.output["evaluation"] = results
 
     print_evaluation_report(results)
 
