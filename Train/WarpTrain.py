@@ -88,5 +88,5 @@ def train_SeqCls(point):
   SeqCls = sequence_classification_model(point)
   prepare_data(SeqCls,point)
   trainersetting(SeqCls,point)
-  postproccess(SeqCls)
+  postprocess(SeqCls)
   return SeqCls
