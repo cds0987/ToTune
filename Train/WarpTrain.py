@@ -38,8 +38,50 @@ def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
   SeqCls.prepare_trainer(args)
 
-def postproccess(SeqCls):
-  SeqCls.train_test()
+def print_evaluation_report(results):
+    print("\n" + "=" * 60)
+    print("📊 CLASSIFICATION PERFORMANCE SUMMARY")
+    print("=" * 60)
+
+    print("\n▶ Overall Metrics")
+    display(results["metrics"])
+
+    print("\n▶ Normalized Confusion Matrix")
+    plot_confusion_matrix(results["confusion_matrix_normalized"])
+
+    print("\n▶ Per-Class Classification Report")
+    display(results["classification_report"])
+
+    if "prob_metrics" in results:
+        print("\n" + "=" * 60)
+        print("📈 PROBABILITY-BASED EVALUATION")
+        print("=" * 60)
+        display(results["prob_metrics"])
+
+    print("\n" + "=" * 60)
+
+def print_tunning(output):
+    print_point(output["Tuner_arg"], "Tuner Config")
+    print_point(output["adaptation"], "Adaptation Config")
+
+from ToTune.Tools.EvaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from IPython.display import display
+def postprocess(SeqCls):
+    SeqCls.train_test()
+
+    print_tunning(SeqCls.output)
+
+    labels = SeqCls.output["labels"]
+    preds = SeqCls.output["preds"]
+    probs = SeqCls.output["probs"]
+
+    results = evaluate_classification(labels=labels, predictions=preds)
+    results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
+
+    SeqCls["evaluation"] = results
+
+    print_evaluation_report(results)
+
 
 def train_SeqCls(point):
   print_point(point)
