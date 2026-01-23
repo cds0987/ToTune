@@ -78,4 +78,4 @@ class SequenceClassification(BasedModel):
             batch_preds = torch.argmax(outputs.logits, dim=-1)
         probs.extend(batch_probs.cpu().tolist())
         preds.extend(batch_preds.cpu().numpy().tolist())
-    return preds
+    return preds,probs

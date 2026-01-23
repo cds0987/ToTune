@@ -64,9 +64,9 @@ class BasedModel:
         pass
     def test(self,max_newtokens):
         texts = self.test_ds[self.text_col]
-        preds = self.inference(texts,max_newtokens)
+        preds,probs = self.inference(texts,max_newtokens)
         labels = self.test_ds[self.label_col]
-        return preds,labels[:len(preds)]
+        return preds,probs,labels[:len(preds)]
     def clear_memory(self, *args, **kwargs):
         del self.model
         del self.tokenizer
@@ -103,8 +103,9 @@ class BasedModel:
         torch.cuda.empty_cache()
         output['Train_size'] = len(self.train_ds)
         output['Test_size'] = len(self.test_ds)
-        preds,labels = self.test(self.max_seq_length)
+        preds,probs,labels = self.test(self.max_seq_length)
         output['preds'] = preds
+        output['probs'] = probs
         output['labels'] = labels
         output['Tuner_arg'] = self.extract_fields(self.essential_keys)
         output['adaptation'] = self.adaptation
