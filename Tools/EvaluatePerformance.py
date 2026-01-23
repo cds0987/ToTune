@@ -141,6 +141,32 @@ from sklearn.metrics import (
     brier_score_loss,
     top_k_accuracy_score,
 )
+import numpy as np
+
+def ensure_probabilities(probs):
+    probs = np.asarray(probs, dtype=np.float64)
+
+    # 1. Handle NaNs / infs
+    probs = np.nan_to_num(probs, nan=0.0, posinf=0.0, neginf=0.0)
+
+    row_sums = probs.sum(axis=1, keepdims=True)
+
+    # 2. Detect logits or invalid probabilities
+    needs_softmax = (
+        np.any(probs < 0) or
+        np.any(probs > 1) or
+        not np.allclose(row_sums, 1.0, atol=1e-3)
+    )
+
+    if needs_softmax:
+        # Stable softmax
+        probs = np.exp(probs - np.max(probs, axis=1, keepdims=True))
+        probs = probs / probs.sum(axis=1, keepdims=True)
+
+    # 3. Final safety normalization
+    probs = probs / probs.sum(axis=1, keepdims=True)
+
+    return probs
 
 def evaluate_probabilities(labels, probs):
     """
@@ -149,7 +175,7 @@ def evaluate_probabilities(labels, probs):
     """
 
     y_true = np.asarray(labels)
-    probs = np.asarray(probs)
+    probs = ensure_probabilities(probs)
 
     n_classes = probs.shape[1]
     is_binary = n_classes == 2
