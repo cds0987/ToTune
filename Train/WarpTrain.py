@@ -2,8 +2,8 @@ from ToTune.Peft.Utils import load_peft_model
 from ToTune.models.Utils import load_sequence_classification_model
 from ToTune.models.SequenceClassification import SequenceClassification
 
-def print_point(point):
-    print("\n===== TRAINING CONFIG =====")
+def print_point(point,title = 'TRAINING CONFIG'):
+    print(f"\n===== {title} =====")
     for k, v in point.items():
         print(f"{k:<22}: {v}")
     print("===========================\n")

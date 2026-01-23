@@ -51,9 +51,11 @@ class SequenceClassification(BasedModel):
   def inference(self, texts, max_seq_length):
     import torch
     from tqdm import tqdm
+    import torch.nn.functional as F
     self.max_new_tokens = max_seq_length
     batch_size = self.batch_size if hasattr(self, 'batch_size') else 32
     preds = []
+    probs = []
     self.model.eval()
     self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     self.model.to(self.device)
@@ -71,7 +73,9 @@ class SequenceClassification(BasedModel):
 
         with torch.no_grad():
             outputs = self.model(**inputs)
+            logits = outputs.logits
+            batch_probs = F.softmax(logits, dim=-1)
             batch_preds = torch.argmax(outputs.logits, dim=-1)
-
+        probs.extend(batch_probs.cpu().tolist())
         preds.extend(batch_preds.cpu().numpy().tolist())
     return preds

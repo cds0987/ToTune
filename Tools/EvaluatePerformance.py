@@ -1,176 +1,133 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 from sklearn.metrics import (
     accuracy_score,
-    precision_recall_fscore_support,
-    confusion_matrix,
-    matthews_corrcoef,
     balanced_accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    matthews_corrcoef,
+    cohen_kappa_score,
+    confusion_matrix,
     classification_report,
-    top_k_accuracy_score
 )
 
-def classification_evaluation(
-    y_true,
-    y_pred,
-    y_proba=None,
-    class_names=None,
-    multilabel=False,
-    top_k=(1, 3, 5),
-    show_confusion_matrix=True,
-    export_csv=None,
-    export_latex=None,
-    cmap="Blues"
-):
+def evaluate_classification(labels, predictions):
     """
-    Comprehensive evaluation for multi-class & multi-label classification.
-
-    Parameters
-    ----------
-    y_true : array-like
-        Ground truth labels (shape: [n_samples] or [n_samples, n_classes])
-    y_pred : array-like
-        Predicted labels (same shape as y_true)
-    y_proba : array-like, optional
-        Predicted probabilities (required for top-k accuracy)
-    class_names : list, optional
-        Class names
-    multilabel : bool, default=False
-        Whether task is multi-label (one-vs-rest)
-    top_k : tuple, default=(1,3,5)
-        Top-k accuracies to compute (multi-class only)
-    show_confusion_matrix : bool
-        Whether to display confusion matrix
-    export_csv : str, optional
-        Path to save CSV summary
-    export_latex : str, optional
-        Path to save LaTeX table
-    cmap : str
-        Colormap for confusion matrix
-
-    Returns
-    -------
-    per_class_df : pd.DataFrame
-    summary_df : pd.DataFrame
-    sklearn_style_df : pd.DataFrame
+    labels: list or array of ground-truth labels
+    predictions: list or array of predicted labels
     """
 
-    y_true = np.asarray(y_true)
-    y_pred = np.asarray(y_pred)
+    y_true = np.asarray(labels)
+    y_pred = np.asarray(predictions)
 
     # -----------------------------
-    # Class handling
-    # -----------------------------
-    if not multilabel:
-        labels = np.unique(np.concatenate([y_true, y_pred]))
-        n_classes = len(labels)
-    else:
-        n_classes = y_true.shape[1]
-        labels = np.arange(n_classes)
-
-    if class_names is None:
-        class_names = [f"Class {i}" for i in labels]
-
-    # -----------------------------
-    # Per-class metrics
-    # -----------------------------
-    precision, recall, f1, support = precision_recall_fscore_support(
-        y_true,
-        y_pred,
-        average=None,
-        zero_division=0
-    )
-
-    per_class_df = pd.DataFrame({
-        "Class": class_names,
-        "Precision": precision,
-        "Recall": recall,
-        "F1-score": f1,
-        "Support": support
-    })
-
-    per_class_df[["Precision", "Recall", "F1-score"]] = \
-        per_class_df[["Precision", "Recall", "F1-score"]].round(4)
-
-    # -----------------------------
-    # Global metrics
+    # 1. Core metrics
     # -----------------------------
     metrics = {
-        "Accuracy": accuracy_score(y_true, y_pred) if not multilabel else np.nan,
-        "Balanced Accuracy": balanced_accuracy_score(y_true, y_pred) if not multilabel else np.nan,
-        "MCC": matthews_corrcoef(y_true.flatten(), y_pred.flatten())
+        "Accuracy": accuracy_score(y_true, y_pred),
+        "Balanced Accuracy": balanced_accuracy_score(y_true, y_pred),
+        "Precision (Macro)": precision_score(y_true, y_pred, average="macro", zero_division=0),
+        "Recall (Macro)": recall_score(y_true, y_pred, average="macro", zero_division=0),
+        "F1-score (Macro)": f1_score(y_true, y_pred, average="macro", zero_division=0),
+        "Precision (Weighted)": precision_score(y_true, y_pred, average="weighted", zero_division=0),
+        "Recall (Weighted)": recall_score(y_true, y_pred, average="weighted", zero_division=0),
+        "F1-score (Weighted)": f1_score(y_true, y_pred, average="weighted", zero_division=0),
+        "Matthews Corrcoef (MCC)": matthews_corrcoef(y_true, y_pred),
+        "Cohen Kappa": cohen_kappa_score(y_true, y_pred),
     }
 
-    for avg in ["macro", "micro", "weighted"]:
-        p, r, f, _ = precision_recall_fscore_support(
-            y_true, y_pred, average=avg, zero_division=0
-        )
-        metrics[f"Precision ({avg})"] = p
-        metrics[f"Recall ({avg})"] = r
-        metrics[f"F1-score ({avg})"] = f
-
-    # -----------------------------
-    # Top-K accuracy (multi-class)
-    # -----------------------------
-    if (y_proba is not None) and (not multilabel):
-        for k in top_k:
-            if k <= y_proba.shape[1]:
-                metrics[f"Top-{k} Accuracy"] = top_k_accuracy_score(
-                    y_true, y_proba, k=k
-                )
-
-    summary_df = pd.DataFrame(
-        {"Metric": metrics.keys(), "Value": metrics.values()}
+    metrics_df = (
+        pd.DataFrame.from_dict(metrics, orient="index", columns=["Score"])
+          .reset_index()
+          .rename(columns={"index": "Metric"})
     )
-    summary_df["Value"] = summary_df["Value"].round(4)
 
     # -----------------------------
-    # Sklearn-style report table
+    # 2. Confusion matrix
     # -----------------------------
-    report_dict = classification_report(
+    cm = confusion_matrix(y_true, y_pred)
+
+    # Support (true samples per class)
+    support = cm.sum(axis=1)
+
+    # Normalized confusion matrix (row-wise)
+    cm_norm = cm / support[:, None]
+
+    labels_sorted = np.unique(y_true)
+
+    cm_df = pd.DataFrame(
+        cm,
+        index=[f"True_{i}" for i in labels_sorted],
+        columns=[f"Pred_{i}" for i in labels_sorted],
+    )
+
+    cm_norm_df = pd.DataFrame(
+        cm_norm,
+        index=[f"True_{i}" for i in labels_sorted],
+        columns=[f"Pred_{i}" for i in labels_sorted],
+    )
+
+    cm_norm_df["Support"] = support
+
+    # -----------------------------
+    # 3. Classification report
+    # -----------------------------
+    report = classification_report(
         y_true,
         y_pred,
-        target_names=class_names,
         output_dict=True,
         zero_division=0
     )
 
-    sklearn_style_df = (
-        pd.DataFrame(report_dict)
-        .transpose()
-        .round(4)
+    report_df = pd.DataFrame(report).T
+
+    return {
+        "metrics": metrics_df.round(4),
+        "confusion_matrix": cm_df,
+        "confusion_matrix_normalized": cm_norm_df.round(4),
+        "classification_report": report_df.round(4),
+    }
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_confusion_matrix(cm_df, title="Confusion Matrix",
+                          cell_size=1.2, max_size=20):
+    data = cm_df.copy()
+
+    # Remove Support column if present
+    if "Support" in data.columns:
+        data = data.drop(columns=["Support"])
+
+    n_classes = data.shape[0]
+
+    # Auto figure size
+    fig_width = min(max_size, max(6, n_classes * cell_size))
+    fig_height = min(max_size, max(5, n_classes * (cell_size*0.5)))
+
+    is_float = np.issubdtype(data.values.dtype, np.floating)
+    fmt = ".2f" if is_float else "d"
+
+    plt.figure(figsize=(fig_width, fig_height))
+    sns.heatmap(
+        data,
+        annot=True,
+        fmt=fmt,
+        cmap="Blues",
+        cbar=True,
+        linewidths=0.5,
+        square=True
     )
 
-    # -----------------------------
-    # Confusion matrix (disabled for multilabel)
-    # -----------------------------
-    if show_confusion_matrix and not multilabel:
-        cm = confusion_matrix(y_true, y_pred)
-        plt.figure(figsize=(1.2 * n_classes, 1 * n_classes))
-        sns.heatmap(
-            cm,
-            annot=True,
-            fmt="d",
-            cmap=cmap,
-            xticklabels=class_names,
-            yticklabels=class_names
-        )
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-        plt.title("Confusion Matrix")
-        plt.tight_layout()
-        plt.show()
+    plt.title(title)
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
 
-    # -----------------------------
-    # Export
-    # -----------------------------
-    if export_csv:
-        summary_df.to_csv(export_csv, index=False)
+    plt.xticks(rotation=45, ha="right")
+    plt.yticks(rotation=0)
 
-    if export_latex:
-        summary_df.to_latex(export_latex, index=False)
-
-    return per_class_df, summary_df, sklearn_style_df
+    plt.tight_layout()
+    plt.show()
