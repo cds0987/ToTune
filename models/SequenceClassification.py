@@ -47,7 +47,11 @@ class SequenceClassification(BasedModel):
         model = self.model,
         train_dataset = self.train_ds
        )
-    
+  def test(self,max_newtokens):
+        texts = self.test_ds[self.text_col]
+        preds,probs = self.inference(texts,max_newtokens)
+        labels = self.test_ds[self.label_col]
+        return preds,probs,labels[:len(preds)]
   def inference(self, texts, max_seq_length):
     import torch
     from tqdm import tqdm

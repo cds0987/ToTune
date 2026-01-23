@@ -63,10 +63,7 @@ class BasedModel:
     def save_modelHgface(self, *args, **kwargs):
         pass
     def test(self,max_newtokens):
-        texts = self.test_ds[self.text_col]
-        preds,probs = self.inference(texts,max_newtokens)
-        labels = self.test_ds[self.label_col]
-        return preds,probs,labels[:len(preds)]
+       pass
     def clear_memory(self, *args, **kwargs):
         del self.model
         del self.tokenizer
