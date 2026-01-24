@@ -212,7 +212,7 @@ class UnslothAlpacaQwen(BasedModel):
     output['Train_size'] = len(self.train_ds)
     output['Test_size'] = len(self.test_ds)
     preds,labels = self.test()
-    y_true, y_pred, label2id, id2label = encode_labels_and_preds(preds, labels)
+    y_true, y_pred, label2id, id2label = encode_labels_and_preds(labels, preds)
 
     output['preds'] = y_pred
     output['labels'] = y_true

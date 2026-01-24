@@ -54,8 +54,11 @@ def SeqCls_postprocess(SeqCls):
 
 def train_SeqCls(point):
   print_point(point)
+  print(f"\n===== Load Model =====")
   SeqCls = sequence_classification_model(point)
+  print(f"\n===== Prepare Data =====")
   prepare_data(SeqCls,point)
+  print(f"\n===== Train Model =====")
   trainersetting(SeqCls,point)
   SeqCls_postprocess(SeqCls)
   return SeqCls
