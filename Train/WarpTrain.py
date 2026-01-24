@@ -67,10 +67,8 @@ def print_tunning(output):
 from ToTune.Tools.EvaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
 from IPython.display import display
 def postprocess(SeqCls):
-    SeqCls.train_test()
-
     print_tunning(SeqCls.output)
-
+    SeqCls.train_test()
     labels = SeqCls.output["labels"]
     preds = SeqCls.output["preds"]
     probs = SeqCls.output["probs"]

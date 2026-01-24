@@ -187,6 +187,8 @@ class UnslothAlpacaQwen(BasedModel):
      **default_args
     ),
 )
+    self.output['adaptation'] = self.adaptation
+    self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
   def test(self,):
     texts = self.test_ds["meta_description"]
     preds = self.inference(texts)

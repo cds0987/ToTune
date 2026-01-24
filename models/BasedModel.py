@@ -14,6 +14,7 @@ class BasedModel:
         self.max_seq_length = max_seq_length
         self.adaptation = adaptation
         self.load_model(model,tokenizer)
+        self.output = {}
     def load_model(self,Model = None,tokenizer = None):
       if Model  is  None:
         raise ValueError("You must provide model and tokenizer explicitly")

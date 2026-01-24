@@ -81,6 +81,8 @@ class SequenceClassification(BasedModel):
         model = self.model,
         train_dataset = self.train_ds
        )
+    self.output['adaptation'] = self.adaptation
+    self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
   def test(self,max_newtokens):
         texts = self.test_ds[self.text_col]
         preds,probs = self.inference(texts,max_newtokens)
