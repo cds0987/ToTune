@@ -50,7 +50,6 @@ def Alpacadata(dataset,tokenizer,base_prompt,text_col,label_col):
 
 
 from ToTune.models.BasedModel import BasedModel
-from ToTune.models.Qwen3_Unsloth import Alpacadata
 class UnslothAlpacaQwen(BasedModel):
   def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
     super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
