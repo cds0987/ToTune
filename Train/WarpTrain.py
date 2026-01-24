@@ -117,5 +117,5 @@ def train_UnslothGemma3(point):
   UnslothGemma3.prepare_trainer(args)
   UnslothGemma3.set_temperature(mode = point['mode'])
   print(f"\n===== Train And Test Model =====")
-  Qwen3_postprocess(UnslothGemma3)
+  Gemma3_postprocess(UnslothGemma3)
   return UnslothGemma3
