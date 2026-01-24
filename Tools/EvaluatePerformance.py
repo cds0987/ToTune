@@ -22,39 +22,59 @@ def evaluate_classification(labels, predictions):
     y_pred = np.asarray(predictions)
 
     # -----------------------------
-    # 1. Core metrics
+    # 1. Core classification metrics
     # -----------------------------
     metrics = {
         "Accuracy": accuracy_score(y_true, y_pred),
         "Balanced Accuracy": balanced_accuracy_score(y_true, y_pred),
-        "Precision (Macro)": precision_score(y_true, y_pred, average="macro", zero_division=0),
-        "Recall (Macro)": recall_score(y_true, y_pred, average="macro", zero_division=0),
-        "F1-score (Macro)": f1_score(y_true, y_pred, average="macro", zero_division=0),
-        "Precision (Weighted)": precision_score(y_true, y_pred, average="weighted", zero_division=0),
-        "Recall (Weighted)": recall_score(y_true, y_pred, average="weighted", zero_division=0),
-        "F1-score (Weighted)": f1_score(y_true, y_pred, average="weighted", zero_division=0),
+        "Precision (Macro)": precision_score(
+            y_true, y_pred, average="macro", zero_division=0
+        ),
+        "Recall (Macro)": recall_score(
+            y_true, y_pred, average="macro", zero_division=0
+        ),
+        "F1-score (Macro)": f1_score(
+            y_true, y_pred, average="macro", zero_division=0
+        ),
+        "Precision (Weighted)": precision_score(
+            y_true, y_pred, average="weighted", zero_division=0
+        ),
+        "Recall (Weighted)": recall_score(
+            y_true, y_pred, average="weighted", zero_division=0
+        ),
+        "F1-score (Weighted)": f1_score(
+            y_true, y_pred, average="weighted", zero_division=0
+        ),
         "Matthews Corrcoef (MCC)": matthews_corrcoef(y_true, y_pred),
         "Cohen Kappa": cohen_kappa_score(y_true, y_pred),
     }
 
     metrics_df = (
         pd.DataFrame.from_dict(metrics, orient="index", columns=["Score"])
-          .reset_index()
-          .rename(columns={"index": "Metric"})
+        .reset_index()
+        .rename(columns={"index": "Metric"})
+        .round(4)
     )
 
     # -----------------------------
-    # 2. Confusion matrix
+    # 2. Confusion matrix (OUTLIER SAFE)
     # -----------------------------
-    cm = confusion_matrix(y_true, y_pred)
+    # IMPORTANT FIX:
+    # Use union of y_true and y_pred to avoid shape mismatch
+    labels_sorted = np.unique(np.concatenate([y_true, y_pred]))
 
-    # Support (true samples per class)
+    cm = confusion_matrix(y_true, y_pred, labels=labels_sorted)
+
+    # Support = true samples per class
     support = cm.sum(axis=1)
 
     # Normalized confusion matrix (row-wise)
-    cm_norm = cm / support[:, None]
-
-    labels_sorted = np.unique(y_true)
+    cm_norm = np.divide(
+        cm,
+        support[:, None],
+        out=np.zeros_like(cm, dtype=float),
+        where=support[:, None] != 0,
+    )
 
     cm_df = pd.DataFrame(
         cm,
@@ -77,16 +97,16 @@ def evaluate_classification(labels, predictions):
         y_true,
         y_pred,
         output_dict=True,
-        zero_division=0
+        zero_division=0,
     )
 
-    report_df = pd.DataFrame(report).T
+    report_df = pd.DataFrame(report).T.round(4)
 
     return {
-        "metrics": metrics_df.round(4),
+        "metrics": metrics_df,
         "confusion_matrix": cm_df,
         "confusion_matrix_normalized": cm_norm_df.round(4),
-        "classification_report": report_df.round(4),
+        "classification_report": report_df,
     }
 
 
