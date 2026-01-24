@@ -161,7 +161,13 @@ class UnslothConservationTextGemma3(BasedModel):
     ),
 )
     from unsloth.chat_templates import train_on_responses_only
-    self.trainer = train_on_responses_only(self.trainer,instruction_part = "<start_of_turn>user\n",response_part = "<start_of_turn>model\n",)
+    self.output['adaptation'] = self.adaptation
+    self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
+    try:
+     self.trainer = train_on_responses_only(self.trainer,instruction_part = "<start_of_turn>user\n",response_part = "<start_of_turn>model\n",)
+    except Exception as e:
+     print("Error in training on responses only using default trainer:", e)
+     pass
   def test(self,):
     texts = self.test_ds["meta_description"]
     preds = self.inference(texts)
