@@ -225,6 +225,7 @@ class UnslothAlpacaQwen(BasedModel):
     self.output = output
   def inference(self, texts):
     from unsloth import FastLanguageModel  # FastVisionModel for LLMs
+    FastLanguageModel.for_inference(self.model)
     batch_size = self.batch_size
     max_seq_length = self.max_seq_length
     import torch

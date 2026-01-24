@@ -90,3 +90,32 @@ def train_UnslothQwenAlpaca(point):
   print(f"\n===== Train And Test Model =====")
   Qwen3_postprocess(UnslothQwen)
   return UnslothQwen
+
+
+
+def Gemma3_postprocess(SeqCls):
+    print_tunning(SeqCls.output)
+    SeqCls.train_test()
+    labels = SeqCls.output["labels"]
+    preds = SeqCls.output["preds"]
+    results = evaluate_classification(labels=labels, predictions=preds)
+    SeqCls.output["evaluation"] = results
+    print_evaluation_report(results)
+
+from ToTune.models.Gemma3_Unsloth import UnslothConservationTextGemma3,load_Gemma3_TextUnsloth_Model
+def train_UnslothGemma3(point):
+  print_point(point)
+  print(f"\n===== Load Model =====")
+  model_name,max_seq_length = point['model_name'],point['max_seq_length']
+  model,tokenizer = load_Gemma3_TextUnsloth_Model(model_name,max_seq_length)
+  UnslothGemma3 = UnslothConservationTextGemma3(model_name,model,tokenizer,max_seq_length = max_seq_length)
+  UnslothGemma3.instruction = point['base_prompt']
+  print(f"\n===== Prepare Data =====")
+  train_ds,test_ds,text_col,label_col = point['train_ds'],point['test_ds'],point['text_col'],point['label_col']
+  UnslothGemma3.preprocess(train_ds,test_ds,text_col,label_col)
+  args = point['trainargs'] if 'trainargs' in point else None
+  UnslothGemma3.prepare_trainer(args)
+  UnslothGemma3.set_temperature(mode = point['mode'])
+  print(f"\n===== Train And Test Model =====")
+  Qwen3_postprocess(UnslothGemma3)
+  return UnslothGemma3
