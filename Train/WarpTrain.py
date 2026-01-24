@@ -62,3 +62,31 @@ def train_SeqCls(point):
   trainersetting(SeqCls,point)
   SeqCls_postprocess(SeqCls)
   return SeqCls
+
+
+def Qwen3_postprocess(SeqCls):
+    print_tunning(SeqCls.output)
+    SeqCls.train_test()
+    labels = SeqCls.output["labels"]
+    preds = SeqCls.output["preds"]
+    results = evaluate_classification(labels=labels, predictions=preds)
+    SeqCls.output["evaluation"] = results
+    print_evaluation_report(results)
+from ToTune.models.Qwen3_Unsloth import UnslothAlpacaQwen,load_Unsloth_Model
+
+def train_UnslothQwenAlpaca(point):
+  print_point(point)
+  print(f"\n===== Load Model =====")
+  model_name,max_seq_length = point['model_name'],point['max_seq_length']
+  model,tokenizer = load_Unsloth_Model(model_name,max_seq_length)
+  UnslothQwen = UnslothAlpacaQwen(model_name,model,tokenizer,max_seq_length = max_seq_length)
+  UnslothQwen.instruction = point['base_prompt']
+  print(f"\n===== Prepare Data =====")
+  train_ds,test_ds,text_col,label_col = point['train_ds'],point['test_ds'],point['text_col'],point['label_col']
+  UnslothQwen.preprocess(train_ds,test_ds,text_col,label_col)
+  args = point['trainargs'] if 'trainargs' in point else None
+  UnslothQwen.prepare_trainer(args)
+  UnslothQwen.set_temperature(mode = point['mode'])
+  print(f"\n===== Train And Test Model =====")
+  Qwen3_postprocess(UnslothQwen)
+  return UnslothQwen

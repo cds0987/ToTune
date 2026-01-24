@@ -198,6 +198,8 @@ class UnslothAlpacaQwen(BasedModel):
     from ToTune.models.BasedModel import warn
     import torch
     warn()
+    import warnings
+    warnings.filterwarnings("ignore")
     output = {}
     from ToTune.Tools.memory import total_current_mem,total_peak_mem
     torch.cuda.empty_cache()
