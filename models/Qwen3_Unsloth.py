@@ -1,6 +1,6 @@
 from unsloth import FastLanguageModel
 from trl import SFTConfig, SFTTrainer
-def load_Unsloth_Model(model_name,max_seq_length):
+def load_QwenUnsloth_Model(model_name,max_seq_length):
   model,tokenizer = FastLanguageModel.from_pretrained(
     model_name = model_name,
     max_seq_length = max_seq_length,

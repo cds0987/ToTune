@@ -72,13 +72,13 @@ def Qwen3_postprocess(SeqCls):
     results = evaluate_classification(labels=labels, predictions=preds)
     SeqCls.output["evaluation"] = results
     print_evaluation_report(results)
-from ToTune.models.Qwen3_Unsloth import UnslothAlpacaQwen,load_Unsloth_Model
+from ToTune.models.Qwen3_Unsloth import UnslothAlpacaQwen,load_QwenUnsloth_Model
 
 def train_UnslothQwenAlpaca(point):
   print_point(point)
   print(f"\n===== Load Model =====")
   model_name,max_seq_length = point['model_name'],point['max_seq_length']
-  model,tokenizer = load_Unsloth_Model(model_name,max_seq_length)
+  model,tokenizer = load_QwenUnsloth_Model(model_name,max_seq_length)
   UnslothQwen = UnslothAlpacaQwen(model_name,model,tokenizer,max_seq_length = max_seq_length)
   UnslothQwen.instruction = point['base_prompt']
   print(f"\n===== Prepare Data =====")
