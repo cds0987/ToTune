@@ -2,11 +2,6 @@ from ToTune.Peft.Utils import load_peft_model
 from ToTune.models.Utils import load_sequence_classification_model
 from ToTune.models.SequenceClassification import SequenceClassification
 
-def print_point(point,title = 'TRAINING CONFIG'):
-    print(f"\n===== {title} =====")
-    for k, v in point.items():
-        print(f"{k:<22}: {v}")
-    print("===========================\n")
 
 def sequence_classification_model(point):
     load_in_4bit = point['load_in_4bit']
@@ -38,35 +33,11 @@ def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
   SeqCls.prepare_trainer(args)
 
-def print_evaluation_report(results):
-    print("\n" + "=" * 60)
-    print("📊 CLASSIFICATION PERFORMANCE SUMMARY")
-    print("=" * 60)
 
-    print("\n▶ Overall Metrics")
-    display(results["metrics"])
-
-    print("\n▶ Normalized Confusion Matrix")
-    plot_confusion_matrix(results["confusion_matrix_normalized"])
-
-    print("\n▶ Per-Class Classification Report")
-    display(results["classification_report"])
-
-    if "prob_metrics" in results:
-        print("\n" + "=" * 60)
-        print("📈 PROBABILITY-BASED EVALUATION")
-        print("=" * 60)
-        display(results["prob_metrics"])
-
-    print("\n" + "=" * 60)
-
-def print_tunning(output):
-    print_point(output["Tuner_arg"], "Tuner Config")
-    print_point(output["adaptation"], "Adaptation Config")
-
-from ToTune.Tools.EvaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.Train.Utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
 from IPython.display import display
-def postprocess(SeqCls):
+def SeqCls_postprocess(SeqCls):
     print_tunning(SeqCls.output)
     SeqCls.train_test()
     labels = SeqCls.output["labels"]
@@ -86,5 +57,5 @@ def train_SeqCls(point):
   SeqCls = sequence_classification_model(point)
   prepare_data(SeqCls,point)
   trainersetting(SeqCls,point)
-  postprocess(SeqCls)
+  SeqCls_postprocess(SeqCls)
   return SeqCls
