@@ -58,7 +58,36 @@ def load_Gemma3_TextUnsloth_Model(model_name,max_seq_length):
 )
   return model,tokenizer
 
+def encode_labels_and_preds(labels, preds, outlier_name="__OUTLIER__"):
+    """
+    labels: list[str] - ground truth labels
+    preds : list[str] - predicted labels
 
+    Returns:
+        y_true : list[int]
+        y_pred : list[int]
+        label2id : dict[str, int]
+        id2label : dict[int, str]
+    """
+
+    # 1. Build label mapping from ground truth only
+    unique_labels = sorted(set(labels))
+    label2id = {label: idx for idx, label in enumerate(unique_labels)}
+    id2label = {idx: label for label, idx in label2id.items()}
+
+    outlier_id = len(label2id)
+    id2label[outlier_id] = outlier_name
+
+    # 2. Encode ground truth
+    y_true = [label2id[label] for label in labels]
+
+    # 3. Encode predictions with outlier handling
+    y_pred = [
+        label2id[p] if p in label2id else outlier_id
+        for p in preds
+    ]
+
+    return y_true, y_pred, label2id, id2label
 from ToTune.models.BasedModel import BasedModel
 class UnslothConservationTextGemma3(BasedModel):
   def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
@@ -191,8 +220,11 @@ class UnslothConservationTextGemma3(BasedModel):
     output['Train_size'] = len(self.train_ds)
     output['Test_size'] = len(self.test_ds)
     preds,labels = self.test()
-    output['preds'] = preds
-    output['labels'] = labels
+    y_true, y_pred, label2id, id2label = encode_labels_and_preds(labels, preds)
+    output['preds'] = y_pred
+    output['labels'] = y_true
+    output['label2id'] = label2id
+    output['id2label'] = id2label
     output['Tuner_arg'] = self.extract_fields(self.essential_keys)
     output['adaptation'] = self.adaptation
     self.output = output
