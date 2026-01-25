@@ -1,7 +1,6 @@
 from ToTune.models.Qwen3_Unsloth import load_QwenUnsloth_Model
 from ToTune.models.Gemma3_Unsloth import SFTGemma3
-from ToTune.models.Utils import load_sequence_classification_model
-from ToTune.models.SequenceClassification import SequenceClassification
+from ToTune.models.SequenceClassification import load_sequence_classification_model,SequenceClassification
 from ToTune.Peft.Utils import load_peft_model
 
 

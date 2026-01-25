@@ -1,3 +1,63 @@
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, BitsAndBytesConfig
+import torch
+from peft import prepare_model_for_kbit_training
+
+def load_sequence_classification_model(
+    model_name: str,
+    num_labels: int,
+    token: None = None,
+    load_in_4bit: bool = False,
+    compute_dtype: torch.dtype = torch.float16,use_gradient_checkpointing = False
+):
+    # --- Tokenizer kwargs ---
+    tok_kwargs = {}
+    if token is not None:
+        tok_kwargs["token"] = token
+
+    tokenizer = AutoTokenizer.from_pretrained(model_name, **tok_kwargs)
+
+    # Ensure padding token exists
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token or "[PAD]"
+        if tokenizer.pad_token == "[PAD]":
+            tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+
+    # --- Optional 4-bit config ---
+    quant_config = None
+    if load_in_4bit:
+        quant_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_type=compute_dtype,
+        )
+
+    # --- Model kwargs ---
+    model_kwargs = {
+        "quantization_config": quant_config,
+        "num_labels": num_labels,
+        "ignore_mismatched_sizes": True,
+    }
+    if token is not None:
+        model_kwargs["token"] = token
+
+    # --- Model ---
+    model = AutoModelForSequenceClassification.from_pretrained(
+        model_name,
+        **model_kwargs,
+    )
+
+    if load_in_4bit:
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing = use_gradient_checkpointing)
+
+    # Resize after adding pad token
+    model.resize_token_embeddings(len(tokenizer))
+    model.config.pad_token_id = tokenizer.pad_token_id
+
+    return model, tokenizer
+
+
+
+
 from transformers import TrainingArguments,Trainer
 from tqdm import tqdm
 from ToTune.models.BasedModel import BasedModel
@@ -86,3 +146,6 @@ class SequenceClassification(BasedModel):
         preds.extend(batch_preds.cpu().numpy().tolist())
     
     return preds,probs
+  
+
+
