@@ -28,7 +28,7 @@ def Load_sequence_classification_model(point):
 from ToTune.models.Gemma3_Unsloth import load_Gemma3_TextUnsloth_Model
 def loadSFTgemma3(point):
     model_name = point['model_name']
-    max_seq_length = point['max_seq_length']
+    max_seq_length = point['max_seq']
     model,tokenizer = load_Gemma3_TextUnsloth_Model(model_name,max_seq_length)
     Gemma3 = SFTGemma3(model_name,model,tokenizer,max_seq_length = max_seq_length)
     instruction = point['instruction']
@@ -38,7 +38,7 @@ from ToTune.models.Qwen3_Unsloth import load_QwenUnsloth_Model
 from ToTune.models.Qwen3_Unsloth import SFTAlpacaQwen
 def loadSFTQwen3Alpaca(point):
     model_name = point['model_name']
-    max_seq_length = point['max_seq_length']
+    max_seq_length = point['max_seq']
     model,tokenizer = load_QwenUnsloth_Model(model_name,max_seq_length)
     Qwen3 = SFTAlpacaQwen(model_name,model,tokenizer,max_seq_length = max_seq_length)
     instruction = point['instruction']
