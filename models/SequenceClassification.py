@@ -47,18 +47,18 @@ class SequenceClassification(BasedModel):
         model = self.model,
         train_dataset = self.train_ds
        )
-  def test(self,max_newtokens):
+  def test(self,):
         texts = self.test_ds[self.text_col]
-        preds,probs = self.inference(texts,max_newtokens)
+        preds,probs = self.inference(texts)
         labels = self.test_ds[self.label_col]
         self.output['preds'] = preds
         self.output['labels'] = labels[:len(preds)]
         self.output['probs'] = probs
-  def inference(self, texts, max_seq_length):
+  def inference(self, texts):
     import torch
     from tqdm import tqdm
     import torch.nn.functional as F
-    self.max_new_tokens = max_seq_length
+    max_seq_length = self.max_seq_length
     batch_size = self.batch_size if hasattr(self, 'batch_size') else 32
     preds = []
     probs = []
