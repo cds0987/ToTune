@@ -11,8 +11,8 @@ def load_sequence_classification_model(point):
 
 
 def prepare_data(SeqCls,point):
-  train_ds, test_ds, text_col, labels_col = point['train_ds'], point['test_ds'], point['text_col'], point['labels_col']
-  SeqCls.preprocess(train_ds,test_ds,text_col,labels_col)
+  train_ds, test_ds, texts_col, labels_col = point['train_ds'], point['test_ds'], point['texts_col'], point['labels_col']
+  SeqCls.preprocess(train_ds,test_ds,texts_col,labels_col)
 
 def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
@@ -28,8 +28,9 @@ def SeqCls_postprocess(SeqCls):
 
     
     if probs is not None:
-        results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
         results = evaluate_classification(labels=labels, predictions=preds)
+        results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
+        
     else:
         from ToTune.Train.Utils import encode_labels_and_preds
         y_true, y_pred, label2id, id2label = encode_labels_and_preds(labels, preds)
@@ -43,8 +44,12 @@ def SeqCls_postprocess(SeqCls):
 
 
 def fullyworkflow(point):
+    print_point(point)
+    print(f"\n===== Load Model =====")
     SeqCls = load_sequence_classification_model(point)
+    print(f"\n===== Prepare Data =====")
     prepare_data(SeqCls,point)
+    print(f"\n===== Train Model =====")
     trainersetting(SeqCls,point)
     SeqCls.train_test()
     SeqCls_postprocess(SeqCls)
