@@ -59,11 +59,11 @@ class BasedModel:
         pass
     def prepare_trainer(self, *args, **kwargs):
         pass
-    def inference(self, text):
+    def inference(self, texts):
         pass
     def save_modelHgface(self, *args, **kwargs):
         pass
-    def test(self,max_newtokens):
+    def test(self,*args, **kwargs):
        pass
     def clear_memory(self, *args, **kwargs):
         del self.model
