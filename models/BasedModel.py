@@ -144,7 +144,7 @@ class UnslothSFTModel(BasedModel):
             pass
        else:
           pass
-    def SFT_prepare_trainer(self,arg = None, mode="work"):
+    def prepare_trainer(self,arg = None, mode="work"):
         from trl import SFTConfig, SFTTrainer
         default_args = {
         "per_device_train_batch_size": 8,
