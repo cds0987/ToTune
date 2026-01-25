@@ -15,6 +15,40 @@ class BasedModel:
         self.adaptation = adaptation
         self.load_model(model,tokenizer)
         self.output = {}
+        self.essential_keys = [
+
+    # --- Data / Batching ---
+    "per_device_train_batch_size",
+    "per_device_eval_batch_size",
+    "gradient_accumulation_steps",
+
+    # --- Optimization ---
+    "learning_rate",
+    "weight_decay",
+    "adam_beta1",
+    "adam_beta2",
+    "adam_epsilon",
+    "max_grad_norm",
+    "optim",
+    "optim_args",
+    "adafactor",
+
+    # --- Training schedule ---
+    "num_train_epochs",
+    "max_steps",
+    "lr_scheduler_type",
+    "warmup_steps",
+    "warmup_ratio",
+
+    # --- Precision ---
+    "fp16",
+    "bf16",
+    "fp16_opt_level",
+    "half_precision_backend",
+
+    # --- Misc ---
+    "label_smoothing_factor",
+]
     def load_model(self,Model = None,tokenizer = None):
       if Model  is  None:
         raise ValueError("You must provide model and tokenizer explicitly")
@@ -53,10 +87,103 @@ class BasedModel:
      result['n_gpu'] = self.trainer.args.n_gpu
      return result
     def train_test(self, *args, **kwargs):
-       pass
+       from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+       self.output['adaptation'] = self.adaptation
+       self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
+       print_tunning(self.output)
+       print(f"\n===== Train Model =====")
+       self.train()
+       print(f"\n===== Test Model =====")
+       self.test()
+    def train(self,):
+        from ToTune.models.BasedModel import warn
+        import torch
+        warn()
+        from ToTune.Tools.memory import total_current_mem,total_peak_mem
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+        mem_before = total_current_mem()
+        import time
+        self.output['Model_name'] = self.model_name
+        start_time = time.time()
+        self.output['trainoutput'] = self.trainer.train()
+        mem_peak = total_peak_mem()
+        self.output['trainer'] = self.trainer
+        self.output['FinetuneMemory'] = mem_peak - mem_before
+        end_time = time.time()
+        self.output['FinetuneTime'] = end_time - start_time
+        trainable_parameters, total_parameters = self.count_paramaters()
+        self.output['FinetuneParameters'] = trainable_parameters
+        self.output['TotalParameters'] = total_parameters
 
 
 
 
 
-
+class UnslothSFTModel(BasedModel):
+    def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
+        super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
+        self.train_onlyresponse = False
+    def set_temperature(self,mode = 'creative'):
+     if mode == 'creative':
+      self.temperature = 0.7
+      self.top_p = 0.8
+      self.top_k = 20
+     elif mode == 'determination':
+      self.temperature = 0.0
+      self.top_p = 1.0
+      self.top_k = 0
+    def set_train_onlyresponse(self,):
+       from unsloth.chat_templates import train_on_responses_only
+       if self.train_onlyresponse:
+          try:
+             self.trainer = train_on_responses_only(self.trainer,instruction_part = "<start_of_turn>user\n",response_part = "<start_of_turn>model\n",)
+          except Exception as e:
+            print("Error in training on responses only using default trainer:", e)
+            pass
+       else:
+          pass
+    def SFT_prepare_trainer(self,arg = None, mode="work"):
+        from trl import SFTConfig, SFTTrainer
+        default_args = {
+        "per_device_train_batch_size": 8,
+        "gradient_accumulation_steps": 4,
+        "num_train_epochs": 1,
+        "warmup_steps": 5,
+        "learning_rate": 2e-5,
+        "logging_steps": 10,
+        "optim": "adamw_8bit",
+        "weight_decay": 0.01,
+        "lr_scheduler_type": "linear",
+        "seed": 3407,
+        "output_dir": "outputs",
+        "report_to": "none",
+    }
+        if arg:
+          default_args.update(arg)
+        if mode == "demo":
+           default_args["max_steps"] = 3  # run only 3 training steps
+           print("⚙️ Running in DEMO mode (max_steps=3)")
+        else:
+           print("🚀 Running in WORK mode (full training)")
+        self.common_args = SFTConfig(
+         **default_args
+        )
+        self.trainer = SFTTrainer(
+           model = self.model,
+           tokenizer = self.tokenizer,
+           train_dataset = self.train_ds,
+           dataset_text_field = "text",
+           max_seq_length = self.max_seq_length,
+           args = SFTConfig(
+           **default_args
+        ),
+)
+        self.set_train_onlyresponse()
+    def test(self,):
+      texts = self.test_ds[self.text_col]
+      preds = self.inference(texts)
+      labels = self.test_ds[self.label_col]
+      self.output['preds'] = preds
+      self.output['labels'] = labels
+    
