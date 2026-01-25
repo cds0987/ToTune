@@ -43,7 +43,7 @@ def SeqCls_postprocess(SeqCls):
     print_evaluation_report(results)
 
 
-def fullyworkflow(point):
+def train_SeqCls(point):
     print_point(point)
     print(f"\n===== Load Model =====")
     SeqCls = load_sequence_classification_model(point)
