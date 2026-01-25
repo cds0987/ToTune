@@ -124,6 +124,7 @@ class UnslothSFTModel(BasedModel):
     def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
         super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
         self.train_onlyresponse = False
+        self.workmode = 'creative'
     def set_temperature(self,mode = 'creative'):
      if mode == 'creative':
       self.temperature = 0.7
