@@ -30,7 +30,7 @@ def preparedata(dataset, tokenizer, base_prompt,text_col,label_col):
 from unsloth import FastModel
 from unsloth.chat_templates import get_chat_template
 
-def load_Gemma3_TextUnsloth_Model(model_name,max_seq_length):
+def load_Gemma3_TextUnsloth_Model(model_name,max_seq_length,load_peft = True):
   model,tokenizer = FastModel.from_pretrained(
     model_name = model_name,
     max_seq_length = max_seq_length,
@@ -39,18 +39,18 @@ def load_Gemma3_TextUnsloth_Model(model_name,max_seq_length):
     full_finetuning = False, # [NEW!] We have full finetuning now!
     # token = "hf_...", # use one if using gated models
 )
-  model = FastModel.get_peft_model(
-    model,
-    finetune_vision_layers     = False, # Turn off for just text!
-    finetune_language_layers   = True,  # Should leave on!
-    finetune_attention_modules = True,  # Attention good for GRPO
-    finetune_mlp_modules       = True,  # SHould leave on always!
-
-    r = 128,           # Larger = higher accuracy, but might overfit
-    lora_alpha = 128,  # Recommended alpha == r at least
-    lora_dropout = 0,
-    bias = "none",
-    random_state = 3407,
+  if load_peft:
+    model = FastModel.get_peft_model(
+            model,
+            finetune_vision_layers     = False, # Turn off for just text!
+            finetune_language_layers   = True,  # Should leave on!
+            finetune_attention_modules = True,  # Attention good for GRPO
+            finetune_mlp_modules       = True,  # SHould leave on always!
+            r = 128,           # Larger = higher accuracy, but might overfit
+            lora_alpha = 128,  # Recommended alpha == r at least
+            lora_dropout = 0,
+            bias = "none",
+            random_state = 3407,
 )
   tokenizer = get_chat_template(
     tokenizer,

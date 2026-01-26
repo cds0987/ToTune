@@ -53,3 +53,90 @@ def train_SeqCls(point):
     trainersetting(SeqCls,point)
     SeqCls.train_test()
     SeqCls_postprocess(SeqCls)
+
+
+
+
+import numpy as np
+
+def print_classification_results(
+    texts,
+    preds,
+    probs=None,
+    label_names=None,
+    top_k=3,
+    max_text_len=120
+):
+    """
+    Flexible print-only classification result viewer.
+
+    Args:
+        texts (list[str]): input texts
+        preds (list[int|str]): predicted class indices or names
+        probs (list[list|dict], optional): probability distributions
+        label_names (list[str], optional): class names
+        top_k (int): number of top classes to show
+        max_text_len (int): truncate long texts
+    """
+
+    for i, text in enumerate(texts):
+        pred = preds[i]
+        prob = probs[i] if probs is not None else None
+
+        print("\n" + "=" * 90)
+        print(f"Sample {i}")
+        print("-" * 90)
+
+        # Text
+        short_text = text[:max_text_len] + ("..." if len(text) > max_text_len else "")
+        print(f"Text: {short_text}\n")
+
+        # ---- Prediction handling (int or str) ----
+        if isinstance(pred, int):
+            pred_name = (
+                label_names[pred]
+                if label_names is not None and pred < len(label_names)
+                else f"Class_{pred}"
+            )
+        else:
+            pred_name = str(pred)
+
+        print(f"Predicted Class : {pred_name}")
+
+        # ---- Probability handling ----
+        if prob is None:
+            print("Confidence      : N/A (no probabilities provided)")
+            continue
+
+        # Dict-style probabilities
+        if isinstance(prob, dict):
+            sorted_items = sorted(prob.items(), key=lambda x: x[1], reverse=True)
+
+            confidence = prob.get(pred_name, max(prob.values()))
+            print(f"Confidence      : {confidence:.6f}\n")
+
+            print(f"Top-{top_k} Classes:")
+            for cls, p in sorted_items[:top_k]:
+                marker = "<==" if cls == pred_name else ""
+                print(f"  {cls:<15} : {p:.6f} {marker}")
+
+        # List / ndarray probabilities
+        else:
+            prob = np.asarray(prob)
+            topk_idx = prob.argsort()[-top_k:][::-1]
+
+            confidence = prob[pred] if isinstance(pred, int) and pred < len(prob) else prob.max()
+            print(f"Confidence      : {confidence:.6f}\n")
+
+            print(f"Top-{top_k} Classes:")
+            for idx in topk_idx:
+                cls_name = (
+                    label_names[idx]
+                    if label_names is not None and idx < len(label_names)
+                    else f"Class_{idx}"
+                )
+                marker = "<==" if isinstance(pred, int) and idx == pred else ""
+                print(f"  {cls_name:<15} : {prob[idx]:.6f} {marker}")
+
+    print("\n" + "=" * 90)
+    print("End of predictions")
