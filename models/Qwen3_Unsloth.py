@@ -144,5 +144,10 @@ class SFTAlpacaQwen(UnslothSFTModel):
         )
 
         preds.extend([t.strip() for t in gen_texts])
+    import re
+    preds  = [
+    re.sub(r"<think>.*?</think>\s*", "", p, flags=re.DOTALL).strip()
+    for p in preds
+]
 
     return preds
