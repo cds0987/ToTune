@@ -59,7 +59,8 @@ class EmbeddingsClassification(BasedModel):
             batch_size = self.batch_size,
             device=self.device,
             show_progress_bar=True
-        ).cpu().numpy()  
+        )
+        embeddings = embeddings.float().cpu().numpy()
         return self.MachineLearning.predict(embeddings)
 
     def test(self,):
@@ -67,4 +68,9 @@ class EmbeddingsClassification(BasedModel):
         preds = self.inference(texts)
         labels = self.test_labels
         self.output['preds'] = preds
-        self.output['labels'] = labels 
+        self.output['labels'] = labels
+    def train_test(self, *args, **kwargs):
+       print(f"\n===== Train Model =====")
+       self.train()
+       print(f"\n===== Test Model =====")
+       self.test()   
