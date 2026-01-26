@@ -66,6 +66,9 @@ class SequenceClassification(BasedModel):
     super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
 
   def preprocess(self,train_ds,test_ds,text_col,label_col):
+     self.train_ds = train_ds
+     self.test_ds  = test_ds
+     self.print_dataset()
      self.text_col = text_col
      self.label_col = label_col
      def process(batch):

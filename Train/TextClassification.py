@@ -13,7 +13,6 @@ def load_sequence_classification_model(point):
 def prepare_data(SeqCls,point):
   train_ds, test_ds, texts_col, labels_col = point['train_ds'], point['test_ds'], point['texts_col'], point['labels_col']
   SeqCls.preprocess(train_ds,test_ds,texts_col,labels_col)
-  SeqCls.print_dataset()
 
 def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
