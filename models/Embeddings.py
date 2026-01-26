@@ -36,7 +36,6 @@ class EmbeddingsClassification(BasedModel):
             all_texts,
             convert_to_tensor=True,
             batch_size = self.batch_size,
-            convert_to_tensor=True,
             device=self.device,
             show_progress_bar=True
         )
