@@ -72,8 +72,6 @@ class EmbeddingsClassification(BasedModel):
         labels = self.test_labels
         self.output['preds'] = preds
         self.output['labels'] = labels
-    def prepare_trainer(self,arg = None):
-        self.ada
     def train_test(self, *args, **kwargs):
        print(f"\n===== Train Model =====")
        self.train()
