@@ -22,6 +22,7 @@ class EmbeddingsClassification(BasedModel):
         super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
         self.machinelearning_name = machinelearning_name
         self.MachineLearning = MachineLearning
+        self.batch_size = 8
     def preprocess(self,train_ds,test_ds,text_col,label_col):
         self.text_col = text_col
         self.label_col = label_col
@@ -35,9 +36,11 @@ class EmbeddingsClassification(BasedModel):
             all_texts,
             convert_to_tensor=True,
             batch_size = self.batch_size,
+            convert_to_tensor=True,
             device=self.device,
             show_progress_bar=True
-        ).cpu().numpy()
+        )
+        self.dataemb = self.dataemb.float().cpu().numpy()
         self.train_emb = self.dataemb[:len(self.train_texts)]
         self.test_emb  = self.dataemb[len(self.train_texts):]
     def train(self,):
