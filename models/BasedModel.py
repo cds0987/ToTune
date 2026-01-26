@@ -111,12 +111,13 @@ class BasedModel:
         self.output['trainoutput'] = self.trainer.train()
         mem_peak = total_peak_mem()
         self.output['trainer'] = self.trainer
-        self.output['train_report']['FinetuneMemory'] = mem_peak - mem_before
+        self.output['train_report']['FinetuneMemory'] = f'{(mem_peak - mem_before) / 1024} (GB)'
         end_time = time.time()
-        self.output['train_report']['FinetuneTime'] = end_time - start_time
+        self.output['train_report']['FinetuneTime'] = f'{(end_time - start_time)/3600} (Hrs)'
         trainable_parameters, total_parameters = self.count_paramaters()
         self.output['train_report']['FinetuneParameters'] = trainable_parameters
         self.output['train_report']['TotalParameters'] = total_parameters
+        self.output['train_report']['PercentFinetuneParameters'] = f'{trainable_parameters / total_parameters * 100:.2f}%'
         print_point(self.output['train_report'], "Tuner Tracking")
 
 
