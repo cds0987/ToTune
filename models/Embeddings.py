@@ -25,6 +25,8 @@ class EmbeddingsClassification(BasedModel):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.batch_size = 8
     def preprocess(self,train_ds,test_ds,text_col,label_col):
+        self.train_ds = train_ds
+        self.test_ds  = test_ds
         self.text_col = text_col
         self.label_col = label_col
         self.train_texts = train_ds[self.text_col]
@@ -69,6 +71,8 @@ class EmbeddingsClassification(BasedModel):
         labels = self.test_labels
         self.output['preds'] = preds
         self.output['labels'] = labels
+    def prepare_trainer(self,arg = None):
+        self.ada
     def train_test(self, *args, **kwargs):
        print(f"\n===== Train Model =====")
        self.train()
