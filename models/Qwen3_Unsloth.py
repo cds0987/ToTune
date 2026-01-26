@@ -73,6 +73,9 @@ class SFTAlpacaQwen(UnslothSFTModel):
     use_rslora = False,
     loftq_config = None,) if not adaptation else adaptation
   def preprocess(self,train_ds,test_ds,text_col,label_col):
+     self.train_ds = train_ds
+     self.test_ds  = test_ds
+     self.print_dataset()
      self.text_col = text_col
      self.label_col = label_col
      self.train_ds = Alpacadata(train_ds,self.tokenizer,self.instruction,text_col,label_col)

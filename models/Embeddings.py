@@ -27,6 +27,7 @@ class EmbeddingsClassification(BasedModel):
     def preprocess(self,train_ds,test_ds,text_col,label_col):
         self.train_ds = train_ds
         self.test_ds  = test_ds
+        self.print_dataset()
         self.text_col = text_col
         self.label_col = label_col
         self.train_texts = train_ds[self.text_col]
@@ -78,3 +79,13 @@ class EmbeddingsClassification(BasedModel):
        self.train()
        print(f"\n===== Test Model =====")
        self.test()   
+
+
+def loadEmbeddingSeqCls(point):
+    model_name = point['model_name']
+    max_seq_length = point['max_seq_length']
+    model,tokenizer = LoadEmbeddingModel(model_name,max_seq_length)
+    machinelearning_name = point['machinelearning_name']
+    MachineLearning = point['MachineLearning']
+    return EmbeddingsClassification(model_name,machinelearning_name,MachineLearning,model,tokenizer,
+                                    max_seq_length = max_seq_length)
