@@ -13,7 +13,7 @@ def LoadEmbeddingModel(model_name,max_seq_length = 128):
     if hasattr(model, "tokenizer"):
         model.tokenizer.model_max_length = max_seq_length
         model.tokenizer.init_kwargs["model_max_length"] = max_seq_length
-    return model
+    return model,model.tokenizer
 
 from tqdm import tqdm
 from ToTune.models.BasedModel import BasedModel
@@ -31,7 +31,7 @@ class EmbeddingsClassification(BasedModel):
         self.test_labels  = test_ds[self.label_col]
         all_texts = self.train_texts + self.test_texts
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.dataemb = self.Model.encode(
+        self.dataemb = self.model.encode(
             all_texts,
             convert_to_tensor=True,
             batch_size = self.batch_size,
@@ -51,7 +51,7 @@ class EmbeddingsClassification(BasedModel):
         end_time = time.time()
         self.output['FinetuneTime'] = end_time - start_time
     def inference(self, texts):
-        embeddings = self.Model.encode(
+        embeddings = self.model.encode(
             texts,
             convert_to_tensor=True,
             batch_size = self.batch_size,
