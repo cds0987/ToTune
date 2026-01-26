@@ -96,6 +96,7 @@ class BasedModel:
        print(f"\n===== Test Model =====")
        self.test()
     def train(self,):
+        from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
         from ToTune.models.BasedModel import warn
         import torch
         warn()
@@ -104,17 +105,21 @@ class BasedModel:
         torch.cuda.reset_peak_memory_stats()
         mem_before = total_current_mem()
         import time
+        self.output['train_report'] = {}
         self.output['Model_name'] = self.model_name
         start_time = time.time()
         self.output['trainoutput'] = self.trainer.train()
         mem_peak = total_peak_mem()
         self.output['trainer'] = self.trainer
-        self.output['FinetuneMemory'] = mem_peak - mem_before
+        self.output['train_report']['FinetuneMemory'] = mem_peak - mem_before
         end_time = time.time()
-        self.output['FinetuneTime'] = end_time - start_time
+        self.output['train_report']['FinetuneTime'] = end_time - start_time
         trainable_parameters, total_parameters = self.count_paramaters()
-        self.output['FinetuneParameters'] = trainable_parameters
-        self.output['TotalParameters'] = total_parameters
+        self.output['train_report']['FinetuneParameters'] = trainable_parameters
+        self.output['train_report']['TotalParameters'] = total_parameters
+        print_point(self.output['train_report'], "Tuner Tracking")
+
+
 
 
 

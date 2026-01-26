@@ -22,6 +22,7 @@ class EmbeddingsClassification(BasedModel):
         super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
         self.machinelearning_name = machinelearning_name
         self.MachineLearning = MachineLearning
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.batch_size = 8
     def preprocess(self,train_ds,test_ds,text_col,label_col):
         self.text_col = text_col
@@ -31,7 +32,6 @@ class EmbeddingsClassification(BasedModel):
         self.train_labels = train_ds[self.label_col]
         self.test_labels  = test_ds[self.label_col]
         all_texts = self.train_texts + self.test_texts
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.dataemb = self.model.encode(
             all_texts,
             convert_to_tensor=True,
