@@ -111,9 +111,9 @@ class BasedModel:
         self.output['trainoutput'] = self.trainer.train()
         mem_peak = total_peak_mem()
         self.output['trainer'] = self.trainer
-        self.output['train_report']['FinetuneMemory'] = f'{((mem_peak - mem_before) / 1024).round(2)} (GB)'
+        self.output['train_report']['FinetuneMemory'] =  f"{round((mem_peak - mem_before) / 1024, 2)} (GB)"
         end_time = time.time()
-        self.output['train_report']['FinetuneTime'] = f'{((end_time - start_time)/3600).round(2)} (Hrs)'
+        self.output['train_report']['FinetuneTime'] = f"{round((end_time - start_time) / 3600, 2)} (Hrs)"
         trainable_parameters, total_parameters = self.count_paramaters()
         self.output['train_report']['FinetuneParameters'] = trainable_parameters
         self.output['train_report']['TotalParameters'] = total_parameters
