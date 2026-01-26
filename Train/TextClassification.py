@@ -1,4 +1,4 @@
-from ToTune.models.Load import Load_sequence_classification_model,loadSFTgemma3,loadSFTQwen3Alpaca
+from ToTune.models.Load import Load_sequence_classification_model,loadSFTgemma3,loadSFTQwen3Alpaca,loadEmbeddingSeqCls
 def load_sequence_classification_model(point):
     procedure = point['procedure'] if 'procedure' in point else 'SeqCls'
     if procedure == 'SeqCls':
@@ -7,6 +7,8 @@ def load_sequence_classification_model(point):
         SeqCls = loadSFTgemma3(point)
     elif procedure == 'SFTQwen3Alpaca':
         SeqCls = loadSFTQwen3Alpaca(point)
+    elif procedure == 'EmbeddingSeqCls':
+        SeqCls = loadEmbeddingSeqCls(point)
     return SeqCls
 
 
