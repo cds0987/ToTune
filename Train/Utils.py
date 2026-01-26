@@ -96,7 +96,7 @@ def print_dataset_demo(
         shuffle: Whether to shuffle before sampling
         seed: Random seed
     """
-
+    print(f"\n===== Dataset Preview =====")
     def _shorten(val):
         if isinstance(val, str) and len(val) > max_text_len:
             return val[:max_text_len] + "..."
