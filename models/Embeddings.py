@@ -67,7 +67,7 @@ class EmbeddingsClassification(BasedModel):
         self.output['MachineLearning_name'] = self.machinelearning_name
         end_time = time.time()
         self.output['FinetuneTime'] = self.output['FinetuneTime']  + (end_time - start_time) if 'FinetuneTime' in self.output else end_time - start_time
-        self.output['FinetuneTime'] = f"{round(self.output['FinetuneTime'] / 3600, 2)} (Hrs)"
+        self.output['FinetuneTime'] = f"{round(self.output['FinetuneTime'] / 3600, 4)} (Hrs)"
         self.output['train_report']['FinetuneTime'] = self.output['FinetuneTime']
         print_point(self.output['train_report'], "Tuner Tracking")
     def inference(self, texts):
