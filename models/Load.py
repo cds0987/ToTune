@@ -51,6 +51,6 @@ def loadEmbeddingSeqCls(point):
     max_seq_length = point['max_seq_length']
     model,tokenizer = LoadEmbeddingModel(model_name,max_seq_length)
     machinelearning_name = point['machinelearning_name']
-    MachineLearning = point['MachineLearning']
-    return EmbeddingsClassification(model_name,machinelearning_name,MachineLearning,model,tokenizer,
+    machinelearning_model = point['machinelearning_model']
+    return EmbeddingsClassification(model_name,machinelearning_name,machinelearning_model,model,tokenizer,
                                     max_seq_length = max_seq_length)

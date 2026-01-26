@@ -14,14 +14,19 @@ def LoadEmbeddingModel(model_name,max_seq_length = 128):
         model.tokenizer.model_max_length = max_seq_length
         model.tokenizer.init_kwargs["model_max_length"] = max_seq_length
     return model,model.tokenizer
-
+from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+from ToTune.models.BasedModel import warn
+import torch
+warn()
+from ToTune.Tools.memory import total_current_mem,total_peak_mem
 from tqdm import tqdm
 from ToTune.models.BasedModel import BasedModel
+import time
 class EmbeddingsClassification(BasedModel):
-    def __init__(self,model_name,machinelearning_name,MachineLearning = None,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
+    def __init__(self,model_name,machinelearning_name,machinelearning_model = None,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
         super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
         self.machinelearning_name = machinelearning_name
-        self.MachineLearning = MachineLearning
+        self.machinelearning_model = machinelearning_model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.batch_size = 8
     def preprocess(self,train_ds,test_ds,text_col,label_col):
@@ -35,6 +40,9 @@ class EmbeddingsClassification(BasedModel):
         self.train_labels = train_ds[self.label_col]
         self.test_labels  = test_ds[self.label_col]
         all_texts = self.train_texts + self.test_texts
+        self.output['train_report'] = {} 
+        mem_before = total_current_mem()
+        start_time = time.time()
         self.dataemb = self.model.encode(
             all_texts,
             convert_to_tensor=True,
@@ -42,6 +50,10 @@ class EmbeddingsClassification(BasedModel):
             device=self.device,
             show_progress_bar=True
         )
+        mem_peak = total_peak_mem()
+        end_time = time.time()
+        self.output['train_report']['FinetuneMemory'] =  f"{round((mem_peak - mem_before) / 1024, 2)} (GB)"
+        self.output['train_report']['FinetuneTime'] = end_time - start_time
         self.dataemb = self.dataemb.float().cpu().numpy()
         self.train_emb = self.dataemb[:len(self.train_texts)]
         self.test_emb  = self.dataemb[len(self.train_texts):]
@@ -50,11 +62,13 @@ class EmbeddingsClassification(BasedModel):
         warn()
         import time
         start_time = time.time()
-        self.MachineLearning.fit(self.train_emb, self.train_labels)
-        self.output['MachineLearning'] = self.MachineLearning
+        self.machinelearning_model.fit(self.train_emb, self.train_labels)
+        self.output['machinelearning_model'] = self.machinelearning_model
         self.output['MachineLearning_name'] = self.machinelearning_name
         end_time = time.time()
-        self.output['FinetuneTime'] = end_time - start_time
+        self.output['FinetuneTime'] = self.output['FinetuneTime']  + (end_time - start_time) if 'FinetuneTime' in self.output else end_time - start_time
+        self.output['FinetuneTime'] = f"{round(self.output['FinetuneTime'] / 3600, 2)} (Hrs)"
+        print_point(self.output['train_report'], "Tuner Tracking")
     def inference(self, texts):
         embeddings = self.model.encode(
             texts,
@@ -64,7 +78,7 @@ class EmbeddingsClassification(BasedModel):
             show_progress_bar=True
         )
         embeddings = embeddings.float().cpu().numpy()
-        return self.MachineLearning.predict(embeddings)
+        return self.machinelearning_model.predict(embeddings)
 
     def test(self,):
         texts = self.test_texts
@@ -73,7 +87,6 @@ class EmbeddingsClassification(BasedModel):
         self.output['preds'] = preds
         self.output['labels'] = labels
     def train_test(self, *args, **kwargs):
-       print(f"\n===== Train Model =====")
        self.train()
        print(f"\n===== Test Model =====")
        self.test()   
