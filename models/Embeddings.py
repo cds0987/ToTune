@@ -2,7 +2,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 import gc
 
-def encode(model_name, texts,max_seq_length = 128,batch_size = 4, savedir=None, name="_IndustryEbd"):
+def LoadEmbeddingModel(model_name,max_seq_length = 128):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     model = SentenceTransformer(model_name, device=device, trust_remote_code=True)
@@ -13,30 +13,7 @@ def encode(model_name, texts,max_seq_length = 128,batch_size = 4, savedir=None, 
     if hasattr(model, "tokenizer"):
         model.tokenizer.model_max_length = max_seq_length
         model.tokenizer.init_kwargs["model_max_length"] = max_seq_length
-
-    embeddings = model.encode(
-        texts,
-        convert_to_tensor=True,
-        device=device,
-        batch_size=batch_size,
-        show_progress_bar=True
-    )
-
-    embeddings = embeddings.cpu()
-
-    savename = model_name.replace('/', '-') if savedir is not None else None
-    if savename is not None:
-        torch.save(embeddings, f'{savedir}/{savename}.pt')
-        print(f"Saved embeddings to {savedir}/{savename}.pt")
-
-    del model
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-        gc.collect()
-        torch.cuda.empty_cache()
-        torch.cuda.reset_peak_memory_stats()
-
-    return embeddings
+    return model
 
 from tqdm import tqdm
 from ToTune.models.BasedModel import BasedModel
