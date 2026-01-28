@@ -85,11 +85,9 @@ class SFTAlpacaQwen(UnslothSFTModel):
     FastLanguageModel.for_inference(self.model)
     self.set_temperature(self.workmode)
     batch_size = self.batch_size
-    max_new_tokens = self.max_seq_length if self.max_seq_length is not None else 32
     import torch
     from tqdm import tqdm
 
-    self.max_new_tokens = max_seq_length
     preds = []
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
