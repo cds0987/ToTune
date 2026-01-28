@@ -85,7 +85,6 @@ class SFTGemma3(UnslothSFTModel):
   def inference(self, texts: list[str]):
         from unsloth import FastLanguageModel
         FastLanguageModel.for_inference(self.model)
-        max_new_tokens = self.max_seq_length if self.max_seq_length is not None else 32
         self.device = self.model.device
         self.model.eval()
         self.set_temperature(self.workmode)
@@ -122,7 +121,7 @@ class SFTGemma3(UnslothSFTModel):
 
             outputs = self.model.generate(
                 inputs,
-                max_new_tokens = max_new_tokens,
+                max_new_tokens = self.max_new_tokens,
                 temperature = self.temperature,
                 do_sample = self.temperature > 0,
                 top_p = self.top_p,
