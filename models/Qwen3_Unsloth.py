@@ -85,7 +85,7 @@ class SFTAlpacaQwen(UnslothSFTModel):
     FastLanguageModel.for_inference(self.model)
     self.set_temperature(self.workmode)
     batch_size = self.batch_size
-    max_seq_length = self.max_seq_length
+    max_new_tokens = self.max_seq_length if self.max_seq_length is not None else 32
     import torch
     from tqdm import tqdm
 

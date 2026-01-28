@@ -33,6 +33,10 @@ def loadSFTgemma3(point):
     Gemma3 = SFTGemma3(model_name,model,tokenizer,max_seq_length = max_seq_length)
     instruction = point['instruction']
     Gemma3.instruction = instruction
+    max_new_tokens = point['max_new_tokens'] if 'max_new_tokens' in point else 32
+    batch_size = point['batch_size'] if 'batch_size' in point else 32
+    Gemma3.batch_size = batch_size
+    Gemma3.max_new_tokens = max_new_tokens
     return Gemma3
 from ToTune.models.Qwen3_Unsloth import load_QwenUnsloth_Model
 from ToTune.models.Qwen3_Unsloth import SFTAlpacaQwen
@@ -43,6 +47,10 @@ def loadSFTQwen3Alpaca(point):
     Qwen3 = SFTAlpacaQwen(model_name,model,tokenizer,max_seq_length = max_seq_length)
     instruction = point['instruction']
     Qwen3.instruction = instruction
+    max_new_tokens = point['max_new_tokens'] if 'max_new_tokens' in point else 32
+    batch_size = point['batch_size'] if 'batch_size' in point else 32
+    Qwen3.batch_size = batch_size
+    Qwen3.max_new_tokens = max_new_tokens
     return Qwen3
 
 from ToTune.models.Embeddings import EmbeddingsClassification,LoadEmbeddingModel
