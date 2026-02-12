@@ -55,6 +55,7 @@ def train_SeqCls(point):
     trainersetting(SeqCls,point)
     SeqCls.train_test()
     SeqCls_postprocess(SeqCls)
+    return SeqCls
 
 
 
