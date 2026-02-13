@@ -14,7 +14,7 @@ def LoadEmbeddingModel(model_name,max_seq_length = 128):
         model.tokenizer.model_max_length = max_seq_length
         model.tokenizer.init_kwargs["model_max_length"] = max_seq_length
     return model,model.tokenizer
-from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
 from ToTune.models.BasedModel import warn
 import torch
 warn()

@@ -1,4 +1,4 @@
-from ToTune.Train.CustomTrainer import CustomTrainer
+from ToTune.TrainTextCls.CustomTrainer import CustomTrainer
 from transformers import Trainer,TrainingArguments
 
 

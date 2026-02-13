@@ -20,8 +20,8 @@ def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
   SeqCls.prepare_trainer(args)
 
-from ToTune.Train.Utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
-from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+from ToTune.TrainTextCls.Utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
 from IPython.display import display
 def SeqCls_postprocess(SeqCls):
     labels = SeqCls.output["labels"]
@@ -43,9 +43,10 @@ def SeqCls_postprocess(SeqCls):
         SeqCls.output["y_pred"] = y_pred
     SeqCls.output["evaluation"] = results
     print_evaluation_report(results)
-
+from ToTune.Tools.Record import get_current_datetime, dataset_agreegate
 
 def train_SeqCls(point):
+    point['tunemode'] = 'TextClassification'
     print_point(point)
     print(f"\n===== Load Model =====")
     SeqCls = load_sequence_classification_model(point)
@@ -55,6 +56,8 @@ def train_SeqCls(point):
     trainersetting(SeqCls,point)
     SeqCls.train_test()
     SeqCls_postprocess(SeqCls)
+    point['timestamp'] = get_current_datetime()
+    dataset_agreegate(point)
     return SeqCls
 
 
