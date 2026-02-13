@@ -231,4 +231,20 @@ def saved_record(point):
        else:
           df.to_csv('training_record.csv',index = False)
           print(f"Saved record locally at training_record.csv")
-       
+
+from ToTune.Tools.Modelhf import save_ModelHgface
+def savedModel(point):
+    if point['model_saved'] is None:
+         print("\n No model name provided, skipping model saving.")
+         return
+    print("\n===== Saved Model =====")
+    try:
+        token = point['token']
+        username = point['username']
+        model_name = point['model_saved']
+        save_ModelHgface(point['model'], point['tokenizer'], username, model_name, token)
+    except Exception as e:
+        print(f"Failed to save model to HuggingFace: {e}")
+        print("Model  saved locally instead.")
+        point['model'].save_pretrained(f"{point['model_saved']}_local")
+        point['tokenizer'].save_pretrained(f"{point['model_saved']}_local")    
