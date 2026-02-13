@@ -208,3 +208,25 @@ def flatten_evaluation_dict(evaluation_dict):
     }
 
     return flat
+
+
+from datasets import Dataset, concatenate_datasets,load_dataset
+from ToTune.Tools.DataHf import pushdata_to_hgface,hf_login
+import pandas as pd
+def saved_record(point):
+    df = record_to_dataframe(point)
+    try:
+       cloud_ = load_dataset(point['cloud_ds'],split = 'train').to_pandas()
+       hf_login(point)
+       df = pd.concat([cloud_,df],ignore_index=True)
+       pushdata_to_hgface(point['cloud_ds'],cloud_ds)
+    except:
+       print('Cannot upload record onto HuggingFace saved on local')
+       save_local_path = point.get('local_save_path',None)
+       if save_local_path is not None:
+          df.to_csv(save_local_path,index = False)
+          print(f"Saved record locally at {save_local_path}")  
+       else:
+          df.to_csv('training_record.csv',index = False)
+          print(f"Saved record locally at training_record.csv")
+       

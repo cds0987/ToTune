@@ -61,6 +61,8 @@ def train_SeqCls(point):
     point['train_report'] = SeqCls.output['train_report']
     from ToTune.TrainTextCls.Utils import flatten_evaluation_dict
     point['evaluation'] = flatten_evaluation_dict(SeqCls.output['evaluation'])
+    from ToTune.TrainTextCls.Utils import saved_record
+    saved_record(point)
     return SeqCls
 
 
