@@ -212,6 +212,7 @@ def flatten_evaluation_dict(evaluation_dict):
 
 from datasets import Dataset, concatenate_datasets,load_dataset
 from ToTune.Tools.DataHf import pushdata_to_hgface,hf_login
+from ToTune.Tools.Record import record_to_dataframe
 import pandas as pd
 def saved_record(point):
     df = record_to_dataframe(point)
@@ -219,7 +220,7 @@ def saved_record(point):
        cloud_ = load_dataset(point['cloud_ds'],split = 'train').to_pandas()
        hf_login(point)
        df = pd.concat([cloud_,df],ignore_index=True)
-       pushdata_to_hgface(point['cloud_ds'],cloud_ds)
+       pushdata_to_hgface(point['cloud_ds'],df,token = point['token'])
     except:
        print('Cannot upload record onto HuggingFace saved on local')
        save_local_path = point.get('local_save_path',None)
