@@ -187,51 +187,94 @@ def ensure_probabilities(probs):
     probs = probs / probs.sum(axis=1, keepdims=True)
 
     return probs
-
+import numpy as np
+import pandas as pd
+from sklearn.metrics import (
+    log_loss,
+    roc_auc_score,
+    average_precision_score,
+    brier_score_loss,
+    top_k_accuracy_score,
+)
 def evaluate_probabilities(labels, probs):
     """
     labels: array-like of shape (n_samples,)
-    probs : array-like of shape (n_samples, n_classes)
+    probs : array-like of shape (n_samples,) or (n_samples, n_classes)
     """
 
     y_true = np.asarray(labels)
-    probs = ensure_probabilities(probs)
+    probs = np.asarray(probs)
+
+    # ---------------------------------
+    # Ensure proper probability shape
+    # ---------------------------------
+    if probs.ndim == 1:
+        # binary positive-class probabilities
+        probs = np.column_stack([1 - probs, probs])
+    elif probs.ndim == 2 and probs.shape[1] == 1:
+        probs = np.column_stack([1 - probs[:, 0], probs[:, 0]])
 
     n_classes = probs.shape[1]
     is_binary = n_classes == 2
+
+    probs = np.clip(probs, 1e-12, 1 - 1e-12)
 
     metrics = {}
 
     # -----------------------------
     # 1. Calibration / confidence
     # -----------------------------
-    metrics["Log Loss"] = log_loss(y_true, probs)
+    metrics["Log Loss"] = log_loss(
+        y_true,
+        probs,
+        labels=np.arange(n_classes),
+    )
 
     if is_binary:
-        metrics["Brier Score"] = brier_score_loss(y_true, probs[:, 1])
+        metrics["Brier Score"] = brier_score_loss(
+            y_true,
+            probs[:, 1]
+        )
 
     # -----------------------------
     # 2. Ranking quality
     # -----------------------------
-    if is_binary:
-        metrics["ROC-AUC"] = roc_auc_score(y_true, probs[:, 1])
-        metrics["PR-AUC"] = average_precision_score(y_true, probs[:, 1])
-    else:
-        metrics["ROC-AUC (OvR Macro)"] = roc_auc_score(
-            y_true, probs, multi_class="ovr", average="macro"
-        )
-        metrics["PR-AUC (Macro)"] = average_precision_score(
-            y_true, probs, average="macro"
-        )
+    try:
+        if is_binary:
+            metrics["ROC-AUC"] = roc_auc_score(y_true, probs[:, 1])
+            metrics["PR-AUC"] = average_precision_score(y_true, probs[:, 1])
+        else:
+            metrics["ROC-AUC (OvR Macro)"] = roc_auc_score(
+                y_true,
+                probs,
+                multi_class="ovr",
+                average="macro",
+            )
+            metrics["PR-AUC (Macro)"] = average_precision_score(
+                y_true,
+                probs,
+                average="macro",
+            )
+    except ValueError:
+        pass  # avoids crash if only one class in y_true
 
     # -----------------------------
     # 3. Top-k accuracy (prob-based)
     # -----------------------------
-    for k in [1, 3, 5]:
-        if k <= n_classes:
-            metrics[f"Top-{k} Accuracy"] = top_k_accuracy_score(
-                y_true, probs, k=k
-            )
+    pred_labels = probs.argmax(axis=1)
+
+    if is_binary:
+        # Avoid sklearn binary top-k bug
+        metrics["Top-1 Accuracy"] = (y_true == pred_labels).mean()
+    else:
+        for k in [1, 3, 5]:
+            if k <= n_classes:
+                metrics[f"Top-{k} Accuracy"] = top_k_accuracy_score(
+                    y_true,
+                    probs,
+                    k=k,
+                    labels=np.arange(n_classes),
+                )
 
     # -----------------------------
     # 4. Confidence statistics
@@ -245,7 +288,7 @@ def evaluate_probabilities(labels, probs):
     # -----------------------------
     # 5. Uncertainty (entropy)
     # -----------------------------
-    entropy = -(probs * np.log(probs + 1e-12)).sum(axis=1)
+    entropy = -(probs * np.log(probs)).sum(axis=1)
     metrics["Mean Entropy"] = entropy.mean()
     metrics["Entropy Std"] = entropy.std()
 
