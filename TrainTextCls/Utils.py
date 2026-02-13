@@ -140,3 +140,71 @@ def print_dataset_demo(
         raise TypeError(
             "Unsupported input type. Expected Dataset, DatasetDict, dict, or list."
         )
+        
+import numpy as np
+
+def flatten_evaluation_dict(evaluation_dict):
+    """
+    Flatten SeqCls.output['evaluation'] into a single flat dictionary.
+    Converts numpy types to pure Python scalars.
+    """
+
+    flat = {}
+
+    # -----------------------------------
+    # 1. Main metrics dataframe
+    # -----------------------------------
+    if "metrics" in evaluation_dict:
+        df = evaluation_dict["metrics"]
+        for _, row in df.iterrows():
+            key = f"metric__{row['Metric']}"
+            flat[key] = row["Score"]
+
+    # -----------------------------------
+    # 2. Probability metrics dataframe
+    # -----------------------------------
+    if "prob_metrics" in evaluation_dict:
+        df = evaluation_dict["prob_metrics"]
+        for _, row in df.iterrows():
+            key = f"prob__{row['Metric']}"
+            flat[key] = row["Score"]
+
+    # -----------------------------------
+    # 3. Confusion matrix
+    # -----------------------------------
+    if "confusion_matrix" in evaluation_dict:
+        cm = evaluation_dict["confusion_matrix"]
+        for row_idx in cm.index:
+            for col in cm.columns:
+                key = f"cm__{row_idx}__{col}"
+                flat[key] = cm.loc[row_idx, col]
+
+    # -----------------------------------
+    # 4. Normalized confusion matrix
+    # -----------------------------------
+    if "confusion_matrix_normalized" in evaluation_dict:
+        cmn = evaluation_dict["confusion_matrix_normalized"]
+        for row_idx in cmn.index:
+            for col in cmn.columns:
+                key = f"cm_norm__{row_idx}__{col}"
+                flat[key] = cmn.loc[row_idx, col]
+
+    # -----------------------------------
+    # 5. Classification report
+    # -----------------------------------
+    if "classification_report" in evaluation_dict:
+        cr = evaluation_dict["classification_report"]
+        for row_idx in cr.index:
+            for col in cr.columns:
+                key = f"report__{row_idx}__{col}"
+                flat[key] = cr.loc[row_idx, col]
+
+    # -----------------------------------
+    # Convert numpy scalars → Python scalars
+    # -----------------------------------
+    flat = {
+        k: (v.item() if isinstance(v, np.generic) else v)
+        for k, v in flat.items()
+    }
+
+    return flat

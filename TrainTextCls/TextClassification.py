@@ -58,6 +58,9 @@ def train_SeqCls(point):
     SeqCls_postprocess(SeqCls)
     point['timestamp'] = get_current_datetime()
     dataset_agreegate(point)
+    point['train_report'] = SeqCls.output['train_report']
+    from ToTune.TrainTextCls.Utils import flatten_evaluation_dict
+    point['evaluation'] = flatten_evaluation_dict(SeqCls.output['evaluation'])
     return SeqCls
 
 
