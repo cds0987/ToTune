@@ -96,10 +96,10 @@ class BasedModel:
        print(f"\n===== Test Model =====")
        self.test()
     def print_dataset(self,):
-       from ToTune.Train.Utils import print_dataset_demo
+       from ToTune.TrainTextCls.Utils import print_dataset_demo
        print_dataset_demo([self.train_ds,self.test_ds])
     def train(self,):
-        from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+        from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
         from ToTune.models.BasedModel import warn
         import torch
         warn()
