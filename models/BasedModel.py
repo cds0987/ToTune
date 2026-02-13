@@ -87,7 +87,7 @@ class BasedModel:
      result['n_gpu'] = self.trainer.args.n_gpu
      return result
     def train_test(self, *args, **kwargs):
-       from ToTune.Train.Utils import print_tunning,print_point,print_evaluation_report
+       from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
        self.output['adaptation'] = self.adaptation
        self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
        print_tunning(self.output)
