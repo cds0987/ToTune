@@ -215,6 +215,7 @@ from ToTune.Tools.DataHf import pushdata_to_hgface,hf_login
 from ToTune.Tools.Record import record_to_dataframe
 import pandas as pd
 def saved_record(point):
+    print("\n===== Saved Record Training =====")
     df = record_to_dataframe(point)
     try:
        cloud_ = load_dataset(point['cloud_ds'],split = 'train').to_pandas()
