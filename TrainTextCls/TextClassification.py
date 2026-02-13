@@ -34,7 +34,7 @@ def SeqCls_postprocess(SeqCls):
         results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
         
     else:
-        from ToTune.Train.Utils import encode_labels_and_preds
+        from ToTune.TrainTextCls.Utils import encode_labels_and_preds
         y_true, y_pred, label2id, id2label = encode_labels_and_preds(labels, preds)
         results = evaluate_classification(labels=y_true, predictions=y_pred)
         SeqCls.output["label2id"] = label2id
