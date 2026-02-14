@@ -1,4 +1,4 @@
-from ToTune.Tools.evaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.tools.evaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
 from IPython.display import display
 
 def print_point(point,title = 'TRAINING CONFIG'):

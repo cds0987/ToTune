@@ -20,9 +20,9 @@ def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
   SeqCls.prepare_trainer(args)
 
-from ToTune.TrainTextCls.utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
-from ToTune.TrainTextCls.utils import print_tunning,print_point,print_evaluation_report
-from ToTune.TrainTextCls.utils import encode_labels_and_preds
+from ToTune.trainTextCls.utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.trainTextCls.utils import print_tunning,print_point,print_evaluation_report
+from ToTune.trainTextCls.utils import encode_labels_and_preds
 from IPython.display import display
 def SeqCls_postprocess(SeqCls):
     labels = SeqCls.output["labels"]
@@ -47,7 +47,7 @@ def SeqCls_postprocess(SeqCls):
     
     
 from ToTune.tools.record import get_current_datetime, dataset_agreegate
-from ToTune.TrainTextCls.Utils import flatten_evaluation_dict,saved_record,savedModel
+from ToTune.trainTextCls.utils import flatten_evaluation_dict,saved_record,savedModel
 def train_SeqCls(point):
     point['tunemode'] = 'TextClassification'
     print_point(point)

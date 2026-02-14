@@ -48,7 +48,7 @@ def Alpacadata(dataset,tokenizer,base_prompt,text_col,label_col):
          return { "text" : texts, }
      return dataset.map(formatting_prompts_func, batched = True,)
 
-from ToTune.models.BasedModel import UnslothSFTModel
+from ToTune.models.basedModel import UnslothSFTModel
 class SFTAlpacaQwen(UnslothSFTModel):
   def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
     super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)

@@ -87,7 +87,7 @@ class BasedModel:
      result['n_gpu'] = self.trainer.args.n_gpu
      return result
     def train_test(self, *args, **kwargs):
-       from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
+       from ToTune.trainTextCls.utils import print_tunning,print_point,print_evaluation_report
        self.output['adaptation'] = self.adaptation
        self.output['Tuner_arg'] = self.extract_fields(self.essential_keys)
        print_tunning(self.output)
@@ -96,14 +96,13 @@ class BasedModel:
        print(f"\n===== Test Model =====")
        self.test()
     def print_dataset(self,):
-       from ToTune.TrainTextCls.Utils import print_dataset_demo
+       from ToTune.trainTextCls.utils import print_dataset_demo
        print_dataset_demo([self.train_ds,self.test_ds])
     def train(self,):
-        from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
-        from ToTune.models.BasedModel import warn
+        from ToTune.trainTextCls.utils import print_tunning,print_point,print_evaluation_report
         import torch
         warn()
-        from ToTune.Tools.memory import total_current_mem,total_peak_mem
+        from ToTune.tools.memory import total_current_mem,total_peak_mem
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
         mem_before = total_current_mem()

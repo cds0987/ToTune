@@ -14,11 +14,13 @@ def LoadEmbeddingModel(model_name,max_seq_length = 128):
         model.tokenizer.model_max_length = max_seq_length
         model.tokenizer.init_kwargs["model_max_length"] = max_seq_length
     return model,model.tokenizer
-from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
+
+
+from ToTune.trainTextCls.utils import print_tunning,print_point,print_evaluation_report
 from ToTune.models.basedModel import warn
 import torch
 warn()
-from ToTune.Tools.memory import total_current_mem,total_peak_mem
+from ToTune.tools.memory import total_current_mem,total_peak_mem
 from tqdm import tqdm
 from ToTune.models.basedModel import BasedModel
 import time
@@ -58,7 +60,7 @@ class EmbeddingsClassification(BasedModel):
         self.train_emb = self.dataemb[:len(self.train_texts)]
         self.test_emb  = self.dataemb[len(self.train_texts):]
     def train(self,):
-        from ToTune.models.BasedModel import warn
+        from ToTune.models.basedModel import warn
         warn()
         import time
         start_time = time.time()
