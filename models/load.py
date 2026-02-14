@@ -10,8 +10,10 @@ def Load_sequence_classification_model(point):
     use_gradient_checkpointing = point['use_gradient_checkpointing']
     model_name = point['model_name']
     max_seq = point['max_seq']
+    token = point['token'] if 'token' in point else None
     Used_model, tokenizer = load_sequence_classification_model(
-        model_name, num_labels, load_in_4bit=load_in_4bit,use_gradient_checkpointing = use_gradient_checkpointing
+        model_name, num_labels, load_in_4bit=load_in_4bit,use_gradient_checkpointing = use_gradient_checkpointing,
+        token = token
     )
     peft_config = point['peft_config'] if 'peft_config' in point else None
     if peft_config is None:
