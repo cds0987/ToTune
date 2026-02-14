@@ -1,5 +1,5 @@
 from peft import get_peft_model, RandLoraConfig
-from ToTune.models.Utils import is_4bit
+from ToTune.models.utils import is_4bit
 
 def load_randlora_model(model, **kwargs):
     """
