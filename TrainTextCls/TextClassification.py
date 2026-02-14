@@ -1,4 +1,4 @@
-from ToTune.models.Load import Load_sequence_classification_model,loadSFTgemma3,loadSFTQwen3Alpaca,loadEmbeddingSeqCls
+from ToTune.models.load import Load_sequence_classification_model,loadSFTgemma3,loadSFTQwen3Alpaca,loadEmbeddingSeqCls
 def load_sequence_classification_model(point):
     procedure = point['procedure'] if 'procedure' in point else 'SeqCls'
     if procedure == 'SeqCls':
@@ -20,8 +20,9 @@ def trainersetting(SeqCls,point):
   args = point['trainargs'] if 'trainargs' in point else None
   SeqCls.prepare_trainer(args)
 
-from ToTune.TrainTextCls.Utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
-from ToTune.TrainTextCls.Utils import print_tunning,print_point,print_evaluation_report
+from ToTune.TrainTextCls.utils import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.TrainTextCls.utils import print_tunning,print_point,print_evaluation_report
+from ToTune.TrainTextCls.utils import encode_labels_and_preds
 from IPython.display import display
 def SeqCls_postprocess(SeqCls):
     labels = SeqCls.output["labels"]
@@ -34,7 +35,7 @@ def SeqCls_postprocess(SeqCls):
         results["prob_metrics"] = evaluate_probabilities(labels=labels, probs=probs)
         
     else:
-        from ToTune.TrainTextCls.Utils import encode_labels_and_preds
+        
         y_true, y_pred, label2id, id2label = encode_labels_and_preds(labels, preds)
         results = evaluate_classification(labels=y_true, predictions=y_pred)
         SeqCls.output["label2id"] = label2id
@@ -43,8 +44,10 @@ def SeqCls_postprocess(SeqCls):
         SeqCls.output["y_pred"] = y_pred
     SeqCls.output["evaluation"] = results
     print_evaluation_report(results)
-from ToTune.Tools.Record import get_current_datetime, dataset_agreegate
-
+    
+    
+from ToTune.tools.record import get_current_datetime, dataset_agreegate
+from ToTune.TrainTextCls.Utils import flatten_evaluation_dict,saved_record,savedModel
 def train_SeqCls(point):
     point['tunemode'] = 'TextClassification'
     print_point(point)
@@ -59,9 +62,7 @@ def train_SeqCls(point):
     point['timestamp'] = get_current_datetime()
     dataset_agreegate(point)
     point['train_report'] = SeqCls.output['train_report']
-    from ToTune.TrainTextCls.Utils import flatten_evaluation_dict
     point['evaluation'] = flatten_evaluation_dict(SeqCls.output['evaluation'])
-    from ToTune.TrainTextCls.Utils import saved_record,savedModel
     saved_record(point)
     point['model'] = SeqCls.model
     point['tokenizer'] = SeqCls.tokenizer

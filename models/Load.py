@@ -1,7 +1,7 @@
-from ToTune.models.Qwen3_Unsloth import load_QwenUnsloth_Model
-from ToTune.models.Gemma3_Unsloth import SFTGemma3
+from ToTune.models.qwen3_Unsloth import load_QwenUnsloth_Model
+from ToTune.models.gemma3_Unsloth import SFTGemma3
 from ToTune.models.SequenceClassification import load_sequence_classification_model,SequenceClassification
-from ToTune.Peft.Utils import load_peft_model
+from ToTune.Peft.utils import load_peft_model
 
 
 def Load_sequence_classification_model(point):
@@ -25,7 +25,7 @@ def Load_sequence_classification_model(point):
         peft_config = adaptation
     SeqCls = SequenceClassification(model_name,Used_model,tokenizer,peft_config,max_seq)
     return SeqCls
-from ToTune.models.Gemma3_Unsloth import load_Gemma3_TextUnsloth_Model
+from ToTune.models.gemma3_Unsloth import load_Gemma3_TextUnsloth_Model
 def loadSFTgemma3(point):
     model_name = point['model_name']
     max_seq_length = point['max_seq']
@@ -38,8 +38,8 @@ def loadSFTgemma3(point):
     Gemma3.batch_size = batch_size
     Gemma3.max_new_tokens = max_new_tokens
     return Gemma3
-from ToTune.models.Qwen3_Unsloth import load_QwenUnsloth_Model
-from ToTune.models.Qwen3_Unsloth import SFTAlpacaQwen
+from ToTune.models.qwen3_Unsloth import load_QwenUnsloth_Model
+from ToTune.models.qwen3_Unsloth import SFTAlpacaQwen
 def loadSFTQwen3Alpaca(point):
     model_name = point['model_name']
     max_seq_length = point['max_seq']
@@ -53,7 +53,7 @@ def loadSFTQwen3Alpaca(point):
     Qwen3.max_new_tokens = max_new_tokens
     return Qwen3
 
-from ToTune.models.Embeddings import EmbeddingsClassification,LoadEmbeddingModel
+from ToTune.models.embeddings import EmbeddingsClassification,LoadEmbeddingModel
 def loadEmbeddingSeqCls(point):
     model_name = point['model_name']
     max_seq_length = point['max_seq_length']

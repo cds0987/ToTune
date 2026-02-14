@@ -1,4 +1,4 @@
-from ToTune.Tools.EvaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
+from ToTune.Tools.evaluatePerformance import evaluate_classification,plot_confusion_matrix,evaluate_probabilities
 from IPython.display import display
 
 def print_point(point,title = 'TRAINING CONFIG'):
@@ -211,8 +211,8 @@ def flatten_evaluation_dict(evaluation_dict):
 
 
 from datasets import Dataset, concatenate_datasets,load_dataset
-from ToTune.Tools.DataHf import pushdata_to_hgface,hf_login
-from ToTune.Tools.Record import record_to_dataframe
+from ToTune.tools.dataHf import pushdata_to_hgface,hf_login
+from ToTune.tools.record import record_to_dataframe
 import pandas as pd
 def saved_record(point):
     print("\n===== Saved Record Training =====")
@@ -232,7 +232,7 @@ def saved_record(point):
           df.to_csv('training_record.csv',index = False)
           print(f"Saved record locally at training_record.csv")
 
-from ToTune.Tools.Modelhf import save_ModelHgface
+from ToTune.tools.modelhf import save_ModelHgface
 def savedModel(point):
     if point['model_saved'] is None:
          print("\n No model name provided, skipping model saving.")

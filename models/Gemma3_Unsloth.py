@@ -59,7 +59,7 @@ def load_Gemma3_TextUnsloth_Model(model_name,max_seq_length,load_peft = True):
   return model,tokenizer
 
 
-from ToTune.models.BasedModel import UnslothSFTModel
+from ToTune.models.basedModel import UnslothSFTModel
 class SFTGemma3(UnslothSFTModel):
   def __init__(self,model_name,Model = None,tokenizer = None,adaptation = {},max_seq_length = 128):
     super().__init__(model_name,Model,tokenizer,adaptation,max_seq_length)
