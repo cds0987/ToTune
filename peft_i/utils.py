@@ -1,8 +1,8 @@
-from ToTune.Peft.lora import load_lora_model
-from ToTune.Peft.randlora import load_randlora_model
-from ToTune.Peft.ia3 import load_ia3_model
-from ToTune.Peft.adalora import load_adalora_model
-from ToTune.Peft.loha import load_loha_model
+from ToTune.peft_i.lora import load_lora_model
+from ToTune.peft_i.randlora import load_randlora_model
+from ToTune.peft_i.ia3 import load_ia3_model
+from ToTune.peft_i.adalora import load_adalora_model
+from ToTune.peft_i.loha import load_loha_model
 
 
 def load_peft_model(model,adaptation = 'lora', **kwargs):
