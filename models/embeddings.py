@@ -31,6 +31,7 @@ class EmbeddingsClassification(BasedModel):
         self.machinelearning_model = machinelearning_model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.batch_size = 8
+        self.dataemb = None
     def preprocess(self,train_ds,test_ds,text_col,label_col):
         self.train_ds = train_ds
         self.test_ds  = test_ds
@@ -45,7 +46,10 @@ class EmbeddingsClassification(BasedModel):
         self.output['train_report'] = {} 
         mem_before = total_current_mem()
         start_time = time.time()
-        self.dataemb = self.model.encode(
+        if self.dataemb is not None:
+            print("Using pre-computed embeddings.")
+        else:
+            self.dataemb = self.model.encode(
             all_texts,
             convert_to_tensor=True,
             batch_size = self.batch_size,

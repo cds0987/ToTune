@@ -66,7 +66,11 @@ def loadEmbeddingSeqCls(point):
     model,tokenizer = LoadEmbeddingModel(model_name,max_seq_length)
     machinelearning_name = point['machinelearning_name']
     machinelearning_model = point['machinelearning_model']
-    return EmbeddingsClassification(model_name,machinelearning_name,machinelearning_model,model,tokenizer,
+    dataemb = point['dataemb'] if 'dataemb' in point else None
+    ebdcls = EmbeddingsClassification(model_name,machinelearning_name,machinelearning_model,model,tokenizer,
                                     max_seq_length = max_seq_length)
+    if dataemb is not None:
+        ebdcls.dataemb = dataemb
+    return ebdcls
 
 
