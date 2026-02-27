@@ -11,7 +11,11 @@ def Load_sequence_classification_model(point):
     model_name = point['model_name']
     max_seq = point['max_seq']
     token = point['token'] if 'token' in point else None
-    Used_model, tokenizer = load_sequence_classification_model(
+    Used_model = point['Used_model'] if 'Used_model' in point else None
+    if Used_model is not None:
+        print(f"Using pre-loaded model: {Used_model}")
+    else:
+        Used_model, tokenizer = load_sequence_classification_model(
         model_name, num_labels, load_in_4bit=load_in_4bit,use_gradient_checkpointing = use_gradient_checkpointing,
         token = token
     )
@@ -64,3 +68,5 @@ def loadEmbeddingSeqCls(point):
     machinelearning_model = point['machinelearning_model']
     return EmbeddingsClassification(model_name,machinelearning_name,machinelearning_model,model,tokenizer,
                                     max_seq_length = max_seq_length)
+
+

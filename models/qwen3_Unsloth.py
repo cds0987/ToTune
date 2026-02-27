@@ -93,7 +93,6 @@ class SFTAlpacaQwen(UnslothSFTModel):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     self.model.eval()
     self.model.to(device)
-
     for i in tqdm(
         range(0, len(texts), batch_size),
         desc="Evaluating",

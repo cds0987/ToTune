@@ -89,7 +89,8 @@ class SFTGemma3(UnslothSFTModel):
         self.model.eval()
         self.set_temperature(self.workmode)
         preds = []
-
+        import torch
+        
         for i in tqdm(
             range(0, len(texts), self.batch_size),
             desc="Evaluating",
@@ -118,8 +119,8 @@ class SFTGemma3(UnslothSFTModel):
                 padding=True,
                 truncation=True,
             ).to(self.device)
-
-            outputs = self.model.generate(
+            with torch.no_grad():
+              outputs = self.model.generate(
                 inputs,
                 max_new_tokens = self.max_new_tokens,
                 temperature = self.temperature,
